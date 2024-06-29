@@ -166,6 +166,7 @@ def answerTrivia(text):
     except:
         context = ""
     context = str(context)
+    print(context)
     messages.append({"role": "user", "content": "Given the following context answer the sports trivia question at the end.  Be humorous but accurate.  If the question is not sports related, politely refuse to answer. Your response should be in markdown format." + context + " " + text})
     chat_response = chat_completion_request(messages)
     reply = chat_response.choices[0].message.content + "\n" + random.choice(referral_links)
