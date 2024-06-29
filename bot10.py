@@ -121,8 +121,8 @@ def topNews(sport_key):
     messages.append({"role": "system", "content": "You are the worlds best AI Sports Handicapper and sportswriter. You are smart, funny and accurate."})
     messages.append({"role": "user", "content": sport_key})
     try:
-      context = ask.news.search_news(sport_key, return_type='string', n_articles=20, categories=["Sports"], start_timestamp=int(start), end_timestamp=int(end)).as_string
-      #print(context)
+      context = ask.news.search_news(sport_key, method="kw", return_type='string', n_articles=20, categories=["Sports"], start_timestamp=int(start), end_timestamp=int(end)).as_string
+      print(context)
     except:
       context = ""
     messages.append({"role": "user", "content": "Write a funny, but accurate article briefly summarizing the various articles. Each article is enclosed in the <doc> </doc> tag.  Ignore redundant articles. Your response should be in markdown format." + context}),
@@ -192,17 +192,17 @@ async def get_score(ctx: discord.AutocompleteContext):
 
 @bot.event
 async def on_ready():
-    bot.loop.create_task(gameLoop(bot))
+    #bot.loop.create_task(gameLoop(bot))
     print(f"{bot.user} is ready and online!")
 
-async def gameLoop(bot):
-    while True:
-        sports = ['baseball_mlb','basketball_nba','icehockey_nhl','mma_mixed_martial_arts','basketball_wnba','soccer_usa_mls','rugby_league_nrl','americanfootball_cfl']
-        for sport in sports:
-            dataGames = requests.get(f"https://api.the-odds-api.com/v4/sports/{sport}/odds/?apiKey={ODDS_API_KEY}&regions=us&markets=totals&bookmakers=draftkings&oddsFormat=american")
-            #print("updated: " f"{sport}")
-            await asyncio.sleep(10)
-        await asyncio.sleep(900)
+#async def gameLoop(bot):
+#    while True:
+#        sports = ['baseball_mlb','basketball_nba','icehockey_nhl','mma_mixed_martial_arts','basketball_wnba','soccer_usa_mls','rugby_league_nrl','americanfootball_cfl']
+#        for sport in sports:
+#            dataGames = requests.get(f"https://api.the-odds-api.com/v4/sports/{sport}/odds/?apiKey={ODDS_API_KEY}&regions=us&markets=totals&bookmakers=draftkings&oddsFormat=american")
+#            #print("updated: " f"{sport}")
+#            await asyncio.sleep(10)
+#        await asyncio.sleep(900)
 
 @bot.slash_command(name="prediction", description="Up to date AI generated predictions on sporting events.")
 async def prediction_command(
@@ -250,7 +250,7 @@ async def recap_command(
   await ctx.defer()
   await ctx.respond(f"{game}" + "\n" + createRecap(f"{sport}", f"{game}" + " " + str(dtdt.today())))
 
-@bot.slash_command(name="trivia", description="Ask me any anything (sport related).")
+@bot.slash_command(name="trivia", description="Ask me any anything sport related.")
 async def trivia_command(
   ctx: discord.ApplicationContext,
   question: discord.Option(str)
