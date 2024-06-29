@@ -99,7 +99,7 @@ def createProp(sport_key, text):
     messages.append({"role": "user", "content": "Write a short article outlining the best individual player prop bets for the following matchup. List the odds and probability.  Give your best bet based on the context provided only mention play prob bets that are referenced in the context and mention the sportsbook.  The response should be in markdown format."})
     chat_response = chat_completion_request(messages)
     reply = chat_response.choices[0].message.content + "\n" + random.choice(referral_links)
-    print(reply)
+    #print(reply)
     return reply
 
 def createParlay(sport_key, text):
@@ -127,7 +127,7 @@ def topNews(sport_key):
     messages.append({"role": "user", "content": sport_key})
     try:
       context = ask.news.search_news(sport_key, method="kw", return_type='string', n_articles=20, categories=["Sports"], start_timestamp=int(start), end_timestamp=int(end)).as_string
-      print(context)
+      #print(context)
     except:
       context = ""
     messages.append({"role": "user", "content": "Write a funny, but accurate article briefly summarizing the various articles. Each article is enclosed in the <doc> </doc> tag.  Ignore redundant articles. Your response should be in markdown format." + context}),
@@ -161,7 +161,7 @@ def answerTrivia(text):
     messages.append({"role": "user", "content": text})
     try:
         #context = ask.news.search_news("Answer the following sports trivia question" + text, method='kw', return_type='string', n_articles=10, categories=["Sports"]).as_string
-        response = clientTavily.search(text, search_depth="advanced")
+        response = clientTavily.search(query=text, search_depth="advanced")
         context = [{"href": obj["url"], "body": obj["content"]} for obj in response.get("results", [])]
     except:
         context = ""
