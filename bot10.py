@@ -72,14 +72,14 @@ def createMessage(sport_key, text):
     start = (datetime.now() - timedelta(hours=24)).timestamp()
     end = datetime.now().timestamp()
     messages = []
-    messages.append({"role": "system", "content": "You are the worlds best AI Sports Handicapper and sportswriter. You are smart, funny and accurate."})
+    messages.append({"role": "system", "content": "You are the worlds best AI Sports Handicapper and sportswriter. You are smart, funny and accurate. Limit your response to 1500 characters or less."})
     messages.append({"role": "user", "content": text})
     try:
       context = ask.news.search_news(text, method='kw', return_type='string', n_articles=10, categories=["Sports"], start_timestamp=int(start), end_timestamp=int(end)).as_string
       #print(context)
     except:
       context = ""
-    messages.append({"role": "user", "content": "Write a short article outlining the odds and statistics for the following matchup.  Give your best bet based on the context provided.  Your article should contain as much detail and statistics as possible yet humorous and sarcastic. Do not make anything up, if hte context doesn't contain information relevant to the question politely and  humorously refuse to give a prediction. If the context does not pertaLimit your response to 200 words. Your response should be in markdown format. " + context + text})
+    messages.append({"role": "user", "content": "Write a short article outlining the odds and statistics for the following matchup.  Give your best bet based on the context provided.  Your article should contain as much detail and statistics as possible yet humorous and sarcastic. Do not make anything up, if hte context doesn't contain information relevant to the question politely and  humorously refuse to give a prediction. If the context is not relevant to the question politely refuse to answer the question. Your response should be in markdown format. " + context + text})
     chat_response = chat_completion_request(messages)
     reply = chat_response.choices[0].message.content + "\n" + random.choice(referral_links)
     #print(reply)
@@ -96,11 +96,11 @@ def createProp(sport_key, text):
       #print(context)
     except:
       context = ""
-    messages.append({"role": "user", "content": "Write a short article outlining the best individual player prop bets for the following matchup. List the odds and probability.  Give your best bet based on the context provided only mention play prob bets that are referenced in the context and mention the sportsbook.  The response should be in markdown format."})
+    messages.append({"role": "user", "content": "Write a short article outlining the best individual player prop bets for the following matchup. List the odds and probability.  Give your best bet based on the context provided only mention play prop bets that are referenced in the context and mention the sportsbook.  The response should be in markdown format."})
     chat_response = chat_completion_request(messages)
     reply = chat_response.choices[0].message.content + "\n" + random.choice(referral_links)
     #print(reply)
-    return reply
+    return reply[:1500]
 
 def createParlay(sport_key, text):
     start = (datetime.now() - timedelta(hours=12)).timestamp()
@@ -113,11 +113,11 @@ def createParlay(sport_key, text):
       #print(context)
     except:
       context = ""
-    messages.append({"role": "user", "content": "Write a short article outlining the best same gam parlay for the following matchup. List the odds and probability.  Give your best bet based on the context provided only mention parlays referenced in the context and include the sportsbook. Your response should be in markdown format."})
+    messages.append({"role": "user", "content": "Write a short article outlining the best same game parlay for the following matchup. List the odds and probability.  Give your best bet based on the context provided only mention parlays referenced in the context and include the sportsbook. Your response should be in markdown format."})
     chat_response = chat_completion_request(messages)
     reply = chat_response.choices[0].message.content + "\n" + random.choice(referral_links)
     #print(reply)
-    return reply
+    return reply[:1500]
 
 def topNews(sport_key):
     start = (datetime.now() - timedelta(hours=24)).timestamp()
@@ -130,11 +130,11 @@ def topNews(sport_key):
       #print(context)
     except:
       context = ""
-    messages.append({"role": "user", "content": "Write a funny, but accurate article briefly summarizing the various articles. Each article is enclosed in the <doc> </doc> tag.  Ignore redundant articles. Your response should be in markdown format. Limit response to 1500 characters or less. " + context}),
+    messages.append({"role": "user", "content": "Write a funny, but accurate article briefly summarizing the various articles. Each article is enclosed in the <doc> </doc> tag.  Ignore redundant articles. Your response should be in markdown format." + context}),
     chat_response = chat_completion_request(messages)
     reply = chat_response.choices[0].message.content + "\n" + random.choice(referral_links)
     #print(reply)
-    return reply
+    return reply[:1500]
 
 
 def createRecap(sport_key, text):
@@ -153,7 +153,7 @@ def createRecap(sport_key, text):
     chat_response = chat_completion_request(messages)
     reply = chat_response.choices[0].message.content + "\n" + random.choice(referral_links)
     #print(reply)
-    return reply
+    return reply[:1500]
 
 def answerTrivia(text):
     messages = []
@@ -171,7 +171,7 @@ def answerTrivia(text):
     chat_response = chat_completion_request(messages)
     reply = chat_response.choices[0].message.content + "\n" + random.choice(referral_links)
     #print(reply)
-    return reply
+    return reply[:1500]
 
 async def get_sport(ctx: discord.AutocompleteContext):
   sport = ctx.options['sport']
