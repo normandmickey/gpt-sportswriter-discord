@@ -100,7 +100,7 @@ def createProp(sport_key, text):
     chat_response = chat_completion_request(messages)
     reply = chat_response.choices[0].message.content + "\n" + random.choice(referral_links)
     #print(reply)
-    return reply[:1500]
+    return reply[:2000]
 
 def createParlay(sport_key, text):
     start = (datetime.now() - timedelta(hours=12)).timestamp()
@@ -117,7 +117,7 @@ def createParlay(sport_key, text):
     chat_response = chat_completion_request(messages)
     reply = chat_response.choices[0].message.content + "\n" + random.choice(referral_links)
     #print(reply)
-    return reply[:1500]
+    return reply[:2000]
 
 def topNews(sport_key):
     start = (datetime.now() - timedelta(hours=24)).timestamp()
@@ -134,7 +134,7 @@ def topNews(sport_key):
     chat_response = chat_completion_request(messages)
     reply = chat_response.choices[0].message.content + "\n" + random.choice(referral_links)
     #print(reply)
-    return reply[:1500]
+    return reply[:2000]
 
 
 def createRecap(sport_key, text):
@@ -153,7 +153,7 @@ def createRecap(sport_key, text):
     chat_response = chat_completion_request(messages)
     reply = chat_response.choices[0].message.content + "\n" + random.choice(referral_links)
     #print(reply)
-    return reply[:1500]
+    return reply[:2000]
 
 def answerTrivia(text):
     messages = []
@@ -171,7 +171,7 @@ def answerTrivia(text):
     chat_response = chat_completion_request(messages)
     reply = chat_response.choices[0].message.content + "\n" + random.choice(referral_links)
     #print(reply)
-    return reply[:1500]
+    return reply[:2000]
 
 async def get_sport(ctx: discord.AutocompleteContext):
   sport = ctx.options['sport']
