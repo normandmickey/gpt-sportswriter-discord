@@ -258,5 +258,5 @@ async def trivia_command(
   await ctx.defer()
   await ctx.respond(f"{question}" + ":\n" + answerTrivia(f"{question}"))
 
-bot.run(os.getenv('DISCORD_BOT_TOKEN')) # run the bot with the token
+bot.run(os.environ.get('DISCORD_BOT_TOKEN')) # run the bot with the token
 
