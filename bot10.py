@@ -9,6 +9,7 @@ import requests_cache
 from groq import Groq
 from asknews_sdk import AskNewsSDK
 from datetime import datetime, timedelta
+from tavily import TavilyClient
 
 requests_cache.install_cache('api_cache', expire_after=900)
 
@@ -23,6 +24,10 @@ GPT_MODEL = "llama3-70b-8192"
 ODDS_API_KEY = os.environ.get('ODDS_API_KEY')
 ASKNEWS_CLIENT_ID = os.environ.get('ASKNEWS_CLIENT_ID')
 ASKNEWS_CLIENT_SECRET = os.environ.get('ASKNEWS_CLIENT_SECRET')
+TAVILY_API_KEY = os.environ.get('TAVILY_API_KEY')
+
+clientTavily = TavilyClient(api_key=TAVILY_API_KEY)
+
 
 ask = AskNewsSDK(
         client_id=ASKNEWS_CLIENT_ID,
@@ -37,7 +42,7 @@ dataSportKeys = dataSportKeys.json()
 sport_keys = []
 leagues = []
 for i in range(len(dataSportKeys)):
-    if (dataSportKeys[i]['has_outrights'] is False and dataSportKeys[i]['group'] in ['American Football','Baseball','Basketball','Boxing','Ice Hockey','Mixed Martial Arts','Rugby League','Soccer','Tennis'] and dataSportKeys[i]['key'] not in ['soccer_argentina_primera_division','soccer_brazil_campeonato','soccer_chile_campeonato','soccer_china_superleague','soccer_conmebol_copa_america','soccer_conmebol_copa_libertadores','soccer_finland_veikkausliiga','soccer_japan_j_league','soccer_league_of_ireland','soccer_sweden_allsvenskan','soccer_uefa_european_championship']):
+    if (dataSportKeys[i]['has_outrights'] is False and dataSportKeys[i]['group'] in ['American Football','Baseball','Basketball','Boxing','Ice Hockey','Mixed Martial Arts','Rugby League','Soccer','Tennis'] and dataSportKeys[i]['key'] not in ['baseball_kbo','icehockey_sweden_hockey_league','soccer_brazil_serie_b','soccer_korea_kleague1','soccer_mexico_ligamx','soccer_norway_eliteserien','soccer_spain_segunda_division','soccer_sweden_superettan','soccer_argentina_primera_division','soccer_brazil_campeonato','soccer_chile_campeonato','soccer_china_superleague','soccer_conmebol_copa_america','soccer_conmebol_copa_libertadores','soccer_finland_veikkausliiga','soccer_japan_j_league','soccer_league_of_ireland','soccer_sweden_allsvenskan','soccer_uefa_european_championship']):
        sport_keys.append(dataSportKeys[i]['key'])
        leagues.append(dataSportKeys[i]['description'])
 
@@ -155,7 +160,9 @@ def answerTrivia(text):
     messages.append({"role": "system", "content": "You are an AI sportswriter. You are smart, funny and accurate."})
     messages.append({"role": "user", "content": text})
     try:
-        context = ask.news.search_news("Answer the following sports trivia question" + text, method='kw', return_type='string', n_articles=10, categories=["Sports"]).as_string
+        #context = ask.news.search_news("Answer the following sports trivia question" + text, method='kw', return_type='string', n_articles=10, categories=["Sports"]).as_string
+        response = clientTavily.search(text, search_depth="advanced")
+        context = [{"href": obj["url"], "body": obj["content"]} for obj in response.get("results", [])]
     except:
         context = ""
     context = str(context)
