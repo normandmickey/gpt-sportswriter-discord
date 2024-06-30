@@ -41,8 +41,52 @@ dataSportKeys = requests.get(f"https://api.the-odds-api.com/v4/sports/?apiKey={O
 dataSportKeys = dataSportKeys.json()
 sport_keys = []
 leagues = []
+includedSports = ['American Football',
+                  'Aussie Rules',
+                  'Baseball',
+                  'Basketball',
+                  'Boxing',
+                  'Ice Hockey',
+                  'Mixed Martial Arts',
+                  'Politics',
+                  'Rugby League',
+                  'Soccer',
+                  'Tennis']
+
+excludedLeagues = ['baseball_kbo',
+                   'icehockey_sweden_hockey_league',
+                   'soccer_brazil_serie_b',
+                   'soccer_korea_kleague1',
+                   'soccer_mexico_ligamx',
+                   'soccer_norway_eliteserien',
+                   'soccer_spain_segunda_division',
+                   'soccer_sweden_superettan',
+                   'soccer_argentina_primera_division',
+                   'soccer_brazil_campeonato',
+                   'soccer_chile_campeonato',
+                   'soccer_china_superleague',
+                   'soccer_conmebol_copa_america',
+                   'soccer_conmebol_copa_libertadores',
+                   'soccer_finland_veikkausliiga',
+                   'soccer_japan_j_league',
+                   'soccer_league_of_ireland',
+                   'soccer_sweden_allsvenskan',
+                   'soccer_uefa_european_championship',
+                   'soccer_belgium_first_div',
+                   'soccer_denmark_superliga',
+                   'soccer_efl_champ',
+                   'soccer_england_efl_cup',
+                   'soccer_englane_league1',
+                   'soccer_england_league2',
+                   'soccer_france_ligue_one',
+                   'soccer_netherlands_eredivisie',
+                   'soccer_spl',
+                   'baseball_milb',
+                   'baseball_npb'
+   
+]
 for i in range(len(dataSportKeys)):
-    if (dataSportKeys[i]['has_outrights'] is False and dataSportKeys[i]['group'] in ['American Football','Baseball','Basketball','Boxing','Ice Hockey','Mixed Martial Arts','Rugby League','Soccer','Tennis'] and dataSportKeys[i]['key'] not in ['baseball_kbo','icehockey_sweden_hockey_league','soccer_brazil_serie_b','soccer_korea_kleague1','soccer_mexico_ligamx','soccer_norway_eliteserien','soccer_spain_segunda_division','soccer_sweden_superettan','soccer_argentina_primera_division','soccer_brazil_campeonato','soccer_chile_campeonato','soccer_china_superleague','soccer_conmebol_copa_america','soccer_conmebol_copa_libertadores','soccer_finland_veikkausliiga','soccer_japan_j_league','soccer_league_of_ireland','soccer_sweden_allsvenskan','soccer_uefa_european_championship']):
+    if (dataSportKeys[i]['has_outrights'] is False and dataSportKeys[i]['group'] in includedSports and dataSportKeys[i]['key'] not in excludedLeagues):
        sport_keys.append(dataSportKeys[i]['key'])
        leagues.append(dataSportKeys[i]['description'])
 
@@ -66,7 +110,6 @@ def chat_completion_request(messages, model=GPT_MODEL):
         #print("Unable to generate ChatCompletion response")
         #print(f"Exception: {e}")
         return e
-
    
 def createMessage(sport_key, text):
     start = (datetime.now() - timedelta(hours=24)).timestamp()
@@ -79,7 +122,7 @@ def createMessage(sport_key, text):
       #print(context)
     except:
       context = ""
-    messages.append({"role": "user", "content": "Write a short article outlining the odds and statistics for the following matchup.  Give your best bet based on the context provided.  Your article should contain as much detail and statistics as possible yet humorous and sarcastic. Do not make anything up, if hte context doesn't contain information relevant to the question politely and  humorously refuse to give a prediction. If the context is not relevant to the question politely refuse to answer the question. Your response should be in markdown format. " + context + text})
+    messages.append({"role": "user", "content": "Write a short article outlining the odds and statistics for the following matchup.  Give your best bet based on the context provided.  Your article should contain as much detail and statistics as possible yet humorous and sarcastic. Do not make anything up, if hte context doesn't contain information relevant to the question politely and  humorously refuse to give a prediction. If the context is not relevant to the question politely refuse to answer the question. Your response should be in markdown format. " + context + " " + text})
     chat_response = chat_completion_request(messages)
     reply = chat_response.choices[0].message.content + "\n" + random.choice(referral_links)
     #print(reply)
@@ -96,7 +139,7 @@ def createProp(sport_key, text):
       #print(context)
     except:
       context = ""
-    messages.append({"role": "user", "content": "Write a short article outlining the best individual player prop bets for the following matchup. List the odds and probability.  Give your best bet based on the context provided only mention play prop bets that are referenced in the context and mention the sportsbook.  The response should be in markdown format."})
+    messages.append({"role": "user", "content": "Write a short article outlining the best individual player prop bets for the following matchup. List the odds and probability.  Give your best bet based on the context provided only mention play prop bets that are referenced in the context and mention the sportsbook.  The response should be in markdown format." + context + " " + text})
     chat_response = chat_completion_request(messages)
     reply = chat_response.choices[0].message.content + "\n" + random.choice(referral_links)
     #print(reply)
@@ -113,7 +156,7 @@ def createParlay(sport_key, text):
       #print(context)
     except:
       context = ""
-    messages.append({"role": "user", "content": "Write a short article outlining the best same game parlay for the following matchup. List the odds and probability.  Give your best bet based on the context provided only mention parlays referenced in the context and include the sportsbook. Your response should be in markdown format."})
+    messages.append({"role": "user", "content": "Write a short article outlining the best same game parlay for the following matchup. List the odds and probability.  Give your best bet based on the context provided only mention parlays referenced in the context and include the sportsbook. Your response should be in markdown format." + context + " " + text})
     chat_response = chat_completion_request(messages)
     reply = chat_response.choices[0].message.content + "\n" + random.choice(referral_links)
     #print(reply)
@@ -130,7 +173,7 @@ def topNews(sport_key):
       #print(context)
     except:
       context = ""
-    messages.append({"role": "user", "content": "Write a funny, but accurate article briefly summarizing the various articles. Each article is enclosed in the <doc> </doc> tag.  Ignore redundant articles. Your response should be in markdown format." + context}),
+    messages.append({"role": "user", "content": "Write a funny, but accurate article briefly summarizing the various articles. Each article is enclosed in the <doc> </doc> tag.  Ignore redundant articles. Your response should be in markdown format." + context + " " + sport_key}),
     chat_response = chat_completion_request(messages)
     reply = chat_response.choices[0].message.content + "\n" + random.choice(referral_links)
     #print(reply)
