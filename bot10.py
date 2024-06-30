@@ -126,7 +126,7 @@ def createMessage(sport_key, text):
     chat_response = chat_completion_request(messages)
     reply = chat_response.choices[0].message.content + "\n" + random.choice(referral_links)
     #print(reply)
-    return reply
+    return reply[:2000]
 
 def createProp(sport_key, text):
     start = (datetime.now() - timedelta(hours=48)).timestamp()
