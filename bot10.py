@@ -19,8 +19,9 @@ bot = discord.Bot()
 ept = pytz.timezone('US/Eastern')
 utc = pytz.utc
 # str format
-fmt = '%Y-%m-%d %H:%M:%S %Z%z'
-GPT_MODEL = "llama3-70b-8192"
+#fmt = '%Y-%m-%d %H:%M:%S %Z%z'
+fmt = '%Y-%m-%d'
+GPT_MODEL = "llama-3.1-70b-Versatile"
 ODDS_API_KEY = os.environ.get('ODDS_API_KEY')
 ASKNEWS_CLIENT_ID = os.environ.get('ASKNEWS_CLIENT_ID')
 ASKNEWS_CLIENT_SECRET = os.environ.get('ASKNEWS_CLIENT_SECRET')
@@ -114,15 +115,20 @@ def chat_completion_request(messages, model=GPT_MODEL):
 def createMessage(sport_key, text):
     start = (datetime.now() - timedelta(hours=24)).timestamp()
     end = datetime.now().timestamp()
+    game = text.split(':')
+    gameId = game[0]
+    match = game[1]
     messages = []
     messages.append({"role": "system", "content": "You are the worlds best AI Sports Handicapper and sportswriter. You are smart, funny and accurate. Limit your response to 1500 characters or less."})
-    messages.append({"role": "user", "content": text})
+    messages.append({"role": "user", "content": match})
     try:
-      context = ask.news.search_news(text, method='kw', return_type='string', n_articles=10, categories=["Sports"], start_timestamp=int(start), end_timestamp=int(end)).as_string
-      #print(context)
+      context = ask.news.search_news(match, method='kw', return_type='string', n_articles=10, categories=["Sports"], start_timestamp=int(start), end_timestamp=int(end)).as_string
+      dataGames = requests.get(f"https://api.the-odds-api.com/v4/sports/{sport_key}/odds/?apiKey={ODDS_API_KEY}&eventIds={gameId}&regions=us&markets=totals,h2h,spreads&bookmakers=draftkings,fanduel,betrivers&oddsFormat=american")
+      odds = str(dataGames.json())
+      print(str(dataGames.json()))
     except:
       context = ""
-    messages.append({"role": "user", "content": "Write a short article outlining the odds and statistics for the following matchup.  Give your best bet based on the context provided.  Your article should contain as much detail and statistics as possible yet humorous and sarcastic. Do not make anything up, if hte context doesn't contain information relevant to the question politely and  humorously refuse to give a prediction. If the context is not relevant to the question politely refuse to answer the question. Your response should be in markdown format. " + context + " " + text})
+    messages.append({"role": "user", "content": "Write a short article outlining the odds and statistics for the following matchup.  Give your best bet based on the context provided.  Your article should contain as much detail and statistics as possible yet humorous and sarcastic. Do not make anything up, if hte context doesn't contain information relevant to the question politely and  humorously refuse to give a prediction. If the context is not relevant to the question politely refuse to answer the question. Your response should be in markdown format. " + context + " " + odds + " " + match})
     chat_response = chat_completion_request(messages)
     reply = chat_response.choices[0].message.content + "\n" + random.choice(referral_links)
     #print(reply)
@@ -225,7 +231,8 @@ async def get_sport(ctx: discord.AutocompleteContext):
       t = dataGames[i]['commence_time']
       utcTime = dtdt(int(t[0:4]), int(t[5:7]), int(t[8:10]), int(t[11:13]), int(t[14:16]), int(t[17:19]), tzinfo=utc)
       esTime = utcTime.astimezone(ept)
-      games.append(dataGames[i]['home_team'] + " vs " + dataGames[i]['away_team'] + " " + str(esTime))
+      #games.append(dataGames[i]['home_team'] + " vs " + dataGames[i]['away_team'] + " " + str(esTime))
+      games.append(dataGames[i]['id'] + ": " + dataGames[i]['home_team'] + " vs " + dataGames[i]['away_team'])
   return games
 
 async def get_score(ctx: discord.AutocompleteContext):

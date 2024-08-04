@@ -1,20 +1,22 @@
-from tavily import TavilyClient
 import os
+from datetime import datetime as dtdt
 from dotenv import load_dotenv
+from asknews_sdk import AskNewsSDK
+from datetime import datetime, timedelta
 
 load_dotenv()
-TAVILY_API_KEY = os.getenv('TAVILY_API_KEY')
-print(TAVILY_API_KEY)
+ASKNEWS_CLIENT_ID = os.environ.get('ASKNEWS_CLIENT_ID')
+ASKNEWS_CLIENT_SECRET = os.environ.get('ASKNEWS_CLIENT_SECRET')
+query = "Tennis ATP Ugo Humbert VS Alexander Shevchenko 2024-07-01 07:46:00-04:00"
+start = (datetime.now() - timedelta(hours=48)).timestamp()
+end = datetime.now().timestamp()
 
-max_results = 5
-client = TavilyClient(api_key=TAVILY_API_KEY)
-# For basic search:
-response = client.search("Cleveland Cavaliers vs Detroit Pistons", search_depth="basic")
-# For advanced search:
-#response = tavily.search(query="Should I invest in Apple in 2024?", search_depth="advanced")
-# Get the search results as context to pass an LLM:
-#context = [{"url": obj["url"], "content": obj["content"]} for obj in response.results]
-#context = [{"body": obj["content"]} for obj in response.get("results", [])]
-context = [{"href": obj["url"], "body": obj["content"]} for obj in response.get("results", [])]
-context = str(context)
-print(context[:20000])
+ask = AskNewsSDK(
+        client_id=ASKNEWS_CLIENT_ID,
+        client_secret=ASKNEWS_CLIENT_SECRET,
+        scopes=["news"]
+)
+
+
+context = ask.news.search_news(query=query, method='kw', return_type='string', n_articles=10, categories=["Sports"], start_timestamp=int(start), end_timestamp=int(end)).as_string
+print(context)
