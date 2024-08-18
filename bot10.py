@@ -236,6 +236,7 @@ async def get_sport(ctx: discord.AutocompleteContext):
       awayTeam = dataGames[i]['away_team'].split()
       game = dataGames[i]['id'] + ": " + dataGames[i]['home_team'] + " vs " + dataGames[i]['away_team'] + " " + str(esTime)
       game = game[:100]
+      print(game)
       games.append(game)
   return games
 
