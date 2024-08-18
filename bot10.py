@@ -114,6 +114,8 @@ def chat_completion_request(messages, model=GPT_MODEL):
    
 def createMessage(sport_key, text):
     #print("game: " + text)
+    odds = ""
+    context = ""
     start = (datetime.now() - timedelta(hours=24)).timestamp()
     end = datetime.now().timestamp()
     game = text.split(':')
