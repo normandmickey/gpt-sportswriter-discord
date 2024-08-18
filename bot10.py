@@ -118,7 +118,7 @@ def createMessage(sport_key, text):
     end = datetime.now().timestamp()
     game = text.split(':')
     gameId = game[0]
-    #print("game id: " + gameId)
+    print("game id: " + gameId)
     match = game[1]
     messages = []
     messages.append({"role": "system", "content": "You are the worlds best AI Sports Handicapper and sportswriter. You are smart, funny and accurate. Limit your response to 1500 characters or less."})
