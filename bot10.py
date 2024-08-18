@@ -232,7 +232,11 @@ async def get_sport(ctx: discord.AutocompleteContext):
       utcTime = dtdt(int(t[0:4]), int(t[5:7]), int(t[8:10]), int(t[11:13]), int(t[14:16]), int(t[17:19]), tzinfo=utc)
       esTime = utcTime.astimezone(ept)
       #games.append(dataGames[i]['home_team'] + " vs " + dataGames[i]['away_team'] + " " + str(esTime))
-      games.append(dataGames[i]['id'] + ": " + dataGames[i]['home_team'] + " vs " + dataGames[i]['away_team'])
+      homeTeam = dataGames[i]['home_team'].split()
+      awayTeam = dataGames[i]['away_team'].split()
+      game = dataGames[i]['id'] + ": " + dataGames[i]['home_team'] + " vs " + dataGames[i]['away_team'] + " " + str(esTime)
+      game = game[:100]
+      games.append(game)
   return games
 
 async def get_score(ctx: discord.AutocompleteContext):
