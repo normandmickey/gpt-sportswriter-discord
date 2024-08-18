@@ -113,21 +113,27 @@ def chat_completion_request(messages, model=GPT_MODEL):
         return e
    
 def createMessage(sport_key, text):
+    #print("game: " + text)
     start = (datetime.now() - timedelta(hours=24)).timestamp()
     end = datetime.now().timestamp()
     game = text.split(':')
     gameId = game[0]
+    #print("game id: " + gameId)
     match = game[1]
     messages = []
     messages.append({"role": "system", "content": "You are the worlds best AI Sports Handicapper and sportswriter. You are smart, funny and accurate. Limit your response to 1500 characters or less."})
     messages.append({"role": "user", "content": match})
+    dataGames = requests.get(f"https://api.the-odds-api.com/v4/sports/{sport_key}/odds/?apiKey={ODDS_API_KEY}&eventIds={gameId}&regions=us&markets=totals,h2h,spreads&bookmakers=draftkings,fanduel,betrivers&oddsFormat=american")
+    odds = str(dataGames.json())
     try:
       context = ask.news.search_news(match, method='kw', return_type='string', n_articles=10, categories=["Sports"], start_timestamp=int(start), end_timestamp=int(end)).as_string
-      dataGames = requests.get(f"https://api.the-odds-api.com/v4/sports/{sport_key}/odds/?apiKey={ODDS_API_KEY}&eventIds={gameId}&regions=us&markets=totals,h2h,spreads&bookmakers=draftkings,fanduel,betrivers&oddsFormat=american")
-      odds = str(dataGames.json())
-      print(str(dataGames.json()))
+      #print("Odds: " + odds)
+      #print("AskNews: " + context)
     except:
-      context = ""
+      response = clientTavily.search(query=text, search_depth="advanced")
+      context = [{"href": obj["url"], "body": obj["content"]} for obj in response.get("results", [])]
+      #print("Odds: " + odds)
+      #print("Tavily: " + context)
     messages.append({"role": "user", "content": "Write a short article outlining the odds and statistics for the following matchup.  Give your best bet based on the context provided.  Your article should contain as much detail and statistics as possible yet humorous and sarcastic. Do not make anything up, if hte context doesn't contain information relevant to the question politely and  humorously refuse to give a prediction. If the context is not relevant to the question politely refuse to answer the question. Your response should be in markdown format. " + context + " " + odds + " " + match})
     chat_response = chat_completion_request(messages)
     reply = chat_response.choices[0].message.content + "\n" + random.choice(referral_links)
@@ -235,8 +241,9 @@ async def get_sport(ctx: discord.AutocompleteContext):
       homeTeam = dataGames[i]['home_team'].split()
       awayTeam = dataGames[i]['away_team'].split()
       game = dataGames[i]['id'] + ": " + dataGames[i]['home_team'] + " vs " + dataGames[i]['away_team'] + " " + str(esTime)
+      #game = dataGames[i]['id'] + ": " + dataGames[i]['home_team'] + " vs " + dataGames[i]['away_team']
       game = game[:100]
-      print(game)
+      #print(game)
       games.append(game)
   return games
 
