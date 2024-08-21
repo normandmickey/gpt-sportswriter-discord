@@ -54,8 +54,7 @@ includedSports = ['American Football',
                   'Soccer',
                   'Tennis']
 
-excludedLeagues = ['baseball_kbo',
-                   'icehockey_sweden_hockey_league',
+excludedLeagues = ['icehockey_sweden_hockey_league',
                    'soccer_brazil_serie_b',
                    'soccer_korea_kleague1',
                    'soccer_mexico_ligamx',
