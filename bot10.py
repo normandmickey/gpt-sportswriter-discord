@@ -83,7 +83,17 @@ excludedLeagues = ['baseball_kbo',
                    'soccer_netherlands_eredivisie',
                    'soccer_spl',
                    'baseball_milb',
-                   'baseball_npb'
+                   'baseball_npb',
+                   'soccer_austria_bundesliga',
+                   'soccer_england_league1',
+                   'soccer_germany_bundesliga',
+                   'soccer_germany_bundesliga2',
+                   'soccer_germany_liga3',
+                   'soccer_greece_super_league',
+                   'soccer_italy_serie_a',
+                   'soccer_poland_ekstraklasa',
+                   'soccer_portugal_primeira_liga',
+                   'soccer_switzerland_superleague'
    
 ]
 for i in range(len(dataSportKeys)):
