@@ -130,7 +130,8 @@ def chat_completion_request(messages):
         response = openai_client.chat.completions.create(
            model=OPENAI_GPT_MODEL,
            messages=messages,
-           max_tokens=400
+           max_tokens=400,
+           temperature=0.3
         )
         #print("OpenAI: " + str(response))
         return response
