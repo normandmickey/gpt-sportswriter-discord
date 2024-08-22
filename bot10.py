@@ -143,7 +143,7 @@ def createMessage(sport_key, text):
     end = datetime.now().timestamp()
     game = text.split(':')
     gameId = game[0]
-    print("game id: " + gameId)
+    #print("game id: " + gameId)
     match = game[1]
     messages = []
     messages.append({"role": "system", "content": "You are the worlds best AI Sports Handicapper and sportswriter. You are smart, funny and accurate. Limit your response to 1500 characters or less."})
@@ -159,7 +159,7 @@ def createMessage(sport_key, text):
         response = clientTavily.search(query=text, search_depth="advanced")
         context = [{"href": obj["url"], "body": obj["content"]} for obj in response.get("results", [])]
       except:
-         context = ""
+        context = ""
       #print("Odds: " + odds)
       #print("Tavily: " + context)
     messages.append({"role": "user", "content": "Write a brief, humorous article outlining the odds and statistics for the following matchup.  Give your best bet based on the context provided.  Your article should contain as much detail and statistics as possible yet humorous and sarcastic. Do not make anything up, if the context doesn't contain information relevant to the question politely and  humorously refuse to give a prediction. If the context is not relevant to the question politely refuse to answer the question. Your response should be in markdown format. " + context + " " + odds + " " + match})
@@ -171,15 +171,20 @@ def createMessage(sport_key, text):
 def createProp(sport_key, text):
     start = (datetime.now() - timedelta(hours=48)).timestamp()
     end = datetime.now().timestamp()
+    context = ""
+    game = text.split(':')
+    gameId = game[0]
+    print("game id: " + gameId)
+    match = game[1]
     messages = []
     messages.append({"role": "system", "content": "You are the worlds best AI Sports Handicapper and sportswriter. You are smart, funny and accurate."})
     messages.append({"role": "user", "content": text})
     try:
-      context = ask.news.search_news("best prop bets for the text " + text, method='kw', return_type='string', n_articles=20, categories=["Sports"], start_timestamp=int(start), end_timestamp=int(end)).as_string
+      context = ask.news.search_news("best prop bets for the text " + match, method='kw', return_type='string', n_articles=20, categories=["Sports"], start_timestamp=int(start), end_timestamp=int(end)).as_string
       #print(context)
     except:
       context = ""
-    messages.append({"role": "user", "content": "Write a short article outlining the best individual player prop bets for the following matchup. List the odds and probability.  Give your best bet based on the context provided only mention play prop bets that are referenced in the context and mention the sportsbook.  The response should be in markdown format." + context + " " + text})
+    messages.append({"role": "user", "content": "Write a short article outlining the best individual player prop bets for the following matchup. List the odds and probability.  Give your best bet based on the context provided only mention play prop bets that are referenced in the context and mention the sportsbook.  The response should be in markdown format." + context + " " + match})
     chat_response = chat_completion_request(messages)
     reply = chat_response.choices[0].message.content + "\n" + random.choice(referral_links)
     #print(reply)
