@@ -10,6 +10,7 @@ from groq import Groq
 from asknews_sdk import AskNewsSDK
 from datetime import datetime, timedelta
 from tavily import TavilyClient
+from openai import OpenAI
 
 requests_cache.install_cache('api_cache', expire_after=900)
 
@@ -21,11 +22,13 @@ utc = pytz.utc
 # str format
 #fmt = '%Y-%m-%d %H:%M:%S %Z%z'
 fmt = '%Y-%m-%d'
-GPT_MODEL = "llama-3.1-70b-Versatile"
+GROQ_GPT_MODEL = "llama-3.1-70b-Versatile"
+OPENAI_GPT_MODEL = "gpt-4o"
 ODDS_API_KEY = os.environ.get('ODDS_API_KEY')
 ASKNEWS_CLIENT_ID = os.environ.get('ASKNEWS_CLIENT_ID')
 ASKNEWS_CLIENT_SECRET = os.environ.get('ASKNEWS_CLIENT_SECRET')
 TAVILY_API_KEY = os.environ.get('TAVILY_API_KEY')
+OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY')
 
 clientTavily = TavilyClient(api_key=TAVILY_API_KEY)
 
@@ -107,19 +110,30 @@ groq_client = Groq(
     api_key=os.environ.get("GROQ_API_KEY"),
 )
 
+openai_client = OpenAI(
+   api_key=os.environ.get("OPENAI_API_KEY")
+)
 
-def chat_completion_request(messages, model=GPT_MODEL):
+
+def chat_completion_request(messages):
     try:
         response = groq_client.chat.completions.create(
-            model=model,
+            model=GROQ_GPT_MODEL,
             messages=messages,
             max_tokens=400
         )
+        #print("Groq: " + str(response))
         return response
-    except Exception as e:
+    except:
         #print("Unable to generate ChatCompletion response")
         #print(f"Exception: {e}")
-        return e
+        response = openai_client.chat.completions.create(
+           model=OPENAI_GPT_MODEL,
+           messages=messages,
+           max_tokens=400
+        )
+        #print("OpenAI: " + str(response))
+        return response
    
 def createMessage(sport_key, text):
     #print("game: " + text)
