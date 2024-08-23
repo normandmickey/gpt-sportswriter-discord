@@ -167,7 +167,7 @@ def createMessage(sport_key, text):
     chat_response = chat_completion_request(messages)
     reply = chat_response.choices[0].message.content + "\n" + random.choice(referral_links)
     #print(reply)
-    return reply[:1990]
+    return reply[:1980]
 
 def createProp(sport_key, text):
     start = (datetime.now() - timedelta(hours=48)).timestamp()
@@ -189,7 +189,7 @@ def createProp(sport_key, text):
     chat_response = chat_completion_request(messages)
     reply = chat_response.choices[0].message.content + "\n" + random.choice(referral_links)
     #print(reply)
-    return reply[:1990]
+    return reply[:1980]
 
 def createParlay(sport_key, text):
     start = (datetime.now() - timedelta(hours=12)).timestamp()
@@ -206,7 +206,7 @@ def createParlay(sport_key, text):
     chat_response = chat_completion_request(messages)
     reply = chat_response.choices[0].message.content + "\n" + random.choice(referral_links)
     #print(reply)
-    return reply[:1990]
+    return reply[:1980]
 
 def topNews(sport_key):
     start = (datetime.now() - timedelta(hours=24)).timestamp()
@@ -223,7 +223,7 @@ def topNews(sport_key):
     chat_response = chat_completion_request(messages)
     reply = chat_response.choices[0].message.content + "\n" + random.choice(referral_links)
     #print(reply)
-    return reply[:1990]
+    return reply[:1980]
 
 
 def createRecap(sport_key, text):
@@ -242,7 +242,7 @@ def createRecap(sport_key, text):
     chat_response = chat_completion_request(messages)
     reply = chat_response.choices[0].message.content + "\n" + random.choice(referral_links)
     #print(reply)
-    return reply[:1990]
+    return reply[:1980]
 
 def answerTrivia(text):
     messages = []
@@ -260,7 +260,7 @@ def answerTrivia(text):
     chat_response = chat_completion_request(messages)
     reply = chat_response.choices[0].message.content + "\n" + random.choice(referral_links)
     #print(reply)
-    return reply[:1990]
+    return reply[:1980]
 
 async def get_sport(ctx: discord.AutocompleteContext):
   sport = ctx.options['sport']
