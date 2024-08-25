@@ -167,7 +167,7 @@ def createMessage(sport_key, text):
     chat_response = chat_completion_request(messages)
     reply = chat_response.choices[0].message.content + "\n" + random.choice(referral_links)
     #print(reply)
-    return reply[:1980]
+    return reply
 
 def createProp(sport_key, text):
     start = (datetime.now() - timedelta(hours=48)).timestamp()
@@ -189,7 +189,7 @@ def createProp(sport_key, text):
     chat_response = chat_completion_request(messages)
     reply = chat_response.choices[0].message.content + "\n" + random.choice(referral_links)
     #print(reply)
-    return reply[:1980]
+    return reply
 
 def createParlay(sport_key, text):
     start = (datetime.now() - timedelta(hours=12)).timestamp()
@@ -206,7 +206,7 @@ def createParlay(sport_key, text):
     chat_response = chat_completion_request(messages)
     reply = chat_response.choices[0].message.content + "\n" + random.choice(referral_links)
     #print(reply)
-    return reply[:1980]
+    return reply
 
 def topNews(sport_key):
     start = (datetime.now() - timedelta(hours=24)).timestamp()
@@ -223,7 +223,7 @@ def topNews(sport_key):
     chat_response = chat_completion_request(messages)
     reply = chat_response.choices[0].message.content + "\n" + random.choice(referral_links)
     #print(reply)
-    return reply[:1980]
+    return reply
 
 
 def createRecap(sport_key, text):
@@ -242,7 +242,7 @@ def createRecap(sport_key, text):
     chat_response = chat_completion_request(messages)
     reply = chat_response.choices[0].message.content + "\n" + random.choice(referral_links)
     #print(reply)
-    return reply[:1980]
+    return reply
 
 def answerTrivia(text):
     messages = []
@@ -260,7 +260,7 @@ def answerTrivia(text):
     chat_response = chat_completion_request(messages)
     reply = chat_response.choices[0].message.content + "\n" + random.choice(referral_links)
     #print(reply)
-    return reply[:1980]
+    return reply
 
 async def get_sport(ctx: discord.AutocompleteContext):
   sport = ctx.options['sport']
@@ -315,7 +315,7 @@ async def prediction_command(
   game: discord.Option(str, autocomplete=discord.utils.basic_autocomplete(get_sport))
 ):
   await ctx.defer()
-  await ctx.respond(f"{game}" + "\n" + createMessage(f"{sport}", f"{game}" + " " + str(dtdt.today())))
+  await ctx.respond((f"{game}" + "\n" + createMessage(f"{sport}", f"{game}" + " " + str(dtdt.today())))[:2000])
 
 
 @bot.slash_command(name="props", description="Best Prop Bets.")
@@ -325,7 +325,7 @@ async def props_command(
   game: discord.Option(str, autocomplete=discord.utils.basic_autocomplete(get_sport))
 ):
   await ctx.defer()
-  await ctx.respond(f"{game}" + "\n" + createProp(f"{sport}", f"{game}" + " " + str(dtdt.today())))
+  await ctx.respond((f"{game}" + "\n" + createProp(f"{sport}", f"{game}" + " " + str(dtdt.today())))[:2000])
 
 @bot.slash_command(name="samegameparlay", description="Best Same Game Parlay.")
 async def samegameparlay_command(
@@ -334,7 +334,7 @@ async def samegameparlay_command(
   game: discord.Option(str, autocomplete=discord.utils.basic_autocomplete(get_sport))
 ):
   await ctx.defer()
-  await ctx.respond(f"{game}" + "\n" + createParlay(f"{sport}", f"{game}" + " " + str(dtdt.today())))
+  await ctx.respond((f"{game}" + "\n" + createParlay(f"{sport}", f"{game}" + " " + str(dtdt.today())))[:2000])
 
 
 @bot.slash_command(name="topnews", description="Latest news by sport.")
@@ -352,7 +352,7 @@ async def recap_command(
   game: discord.Option(str, autocomplete=discord.utils.basic_autocomplete(get_score))
 ):
   await ctx.defer()
-  await ctx.respond(f"{game}" + "\n" + createRecap(f"{sport}", f"{game}" + " " + str(dtdt.today())))
+  await ctx.respond((f"{game}" + "\n" + createRecap(f"{sport}", f"{game}" + " " + str(dtdt.today())))[:2000])
 
 @bot.slash_command(name="trivia", description="Ask me any anything sport related.")
 async def trivia_command(
@@ -360,7 +360,7 @@ async def trivia_command(
   question: discord.Option(str)
 ):
   await ctx.defer()
-  await ctx.respond(f"{question}" + ":\n" + answerTrivia(f"{question}"))
+  await ctx.respond((f"{question}" + ":\n" + answerTrivia(f"{question}"))[:2000])
 
 bot.run(os.environ.get('DISCORD_BOT_TOKEN')) # run the bot with the token
 
