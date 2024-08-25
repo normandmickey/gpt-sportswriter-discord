@@ -175,7 +175,7 @@ def createProp(sport_key, text):
     context = ""
     game = text.split(':')
     gameId = game[0]
-    print("game id: " + gameId)
+    #print("game id: " + gameId)
     match = game[1]
     messages = []
     messages.append({"role": "system", "content": "You are the worlds best AI Sports Handicapper and sportswriter. You are smart, funny and accurate."})
