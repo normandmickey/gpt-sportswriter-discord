@@ -315,7 +315,7 @@ async def prediction_command(
   game: discord.Option(str, autocomplete=discord.utils.basic_autocomplete(get_sport))
 ):
   await ctx.defer()
-  await ctx.respond((f"{game}" + "\n" + createMessage(f"{sport}", f"{game}" + " " + str(dtdt.today())))[:2000])
+  await ctx.respond((createMessage(f"{sport}", f"{game}"))[:2000])
 
 
 @bot.slash_command(name="props", description="Best Prop Bets.")
@@ -325,7 +325,7 @@ async def props_command(
   game: discord.Option(str, autocomplete=discord.utils.basic_autocomplete(get_sport))
 ):
   await ctx.defer()
-  await ctx.respond((f"{game}" + "\n" + createProp(f"{sport}", f"{game}" + " " + str(dtdt.today())))[:2000])
+  await ctx.respond((createProp(f"{sport}", f"{game}"))[:2000])
 
 @bot.slash_command(name="samegameparlay", description="Best Same Game Parlay.")
 async def samegameparlay_command(
@@ -334,7 +334,7 @@ async def samegameparlay_command(
   game: discord.Option(str, autocomplete=discord.utils.basic_autocomplete(get_sport))
 ):
   await ctx.defer()
-  await ctx.respond((f"{game}" + "\n" + createParlay(f"{sport}", f"{game}" + " " + str(dtdt.today())))[:2000])
+  await ctx.respond((createParlay(f"{sport}", f"{game}"))[:2000])
 
 
 @bot.slash_command(name="topnews", description="Latest news by sport.")
@@ -352,7 +352,7 @@ async def recap_command(
   game: discord.Option(str, autocomplete=discord.utils.basic_autocomplete(get_score))
 ):
   await ctx.defer()
-  await ctx.respond((f"{game}" + "\n" + createRecap(f"{sport}", f"{game}" + " " + str(dtdt.today())))[:2000])
+  await ctx.respond((createRecap(f"{sport}", f"{game}"))[:2000])
 
 @bot.slash_command(name="trivia", description="Ask me any anything sport related.")
 async def trivia_command(
