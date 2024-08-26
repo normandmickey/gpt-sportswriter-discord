@@ -343,7 +343,7 @@ async def topnews_command(
   sport: discord.Option(str, choices=leagues),
 ):
   await ctx.defer()
-  await ctx.respond(topNews(f"{sport}"))
+  await ctx.respond((topNews(f"{sport}"))[:2000])
 
 @bot.slash_command(name="recap", description="Get highlights of recent matches.")
 async def recap_command(
