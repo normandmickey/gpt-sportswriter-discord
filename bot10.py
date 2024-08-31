@@ -116,13 +116,14 @@ openai_client = OpenAI(
 
 
 def chat_completion_request(messages):
+    print(messages)
     try:
         response = groq_client.chat.completions.create(
             model=GROQ_GPT_MODEL,
             messages=messages,
-            max_tokens=400
+            max_tokens=500
         )
-        #print("Groq: " + str(response))
+        print("Groq: " + str(response))
         return response
     except:
         #print("Unable to generate ChatCompletion response")
@@ -130,10 +131,10 @@ def chat_completion_request(messages):
         response = openai_client.chat.completions.create(
            model=OPENAI_GPT_MODEL,
            messages=messages,
-           max_tokens=400,
+           max_tokens=500,
            temperature=0.3
         )
-        #print("OpenAI: " + str(response))
+        print("OpenAI: " + str(response))
         return response
    
 def createMessage(sport_key, text):
@@ -159,6 +160,7 @@ def createMessage(sport_key, text):
       try:
         response = clientTavily.search(query=text, search_depth="advanced")
         context = [{"href": obj["url"], "body": obj["content"]} for obj in response.get("results", [])]
+        #print("Tavily: " + context)
       except:
         context = ""
       #print("Odds: " + odds)

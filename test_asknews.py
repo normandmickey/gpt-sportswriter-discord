@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 load_dotenv()
 ASKNEWS_CLIENT_ID = os.environ.get('ASKNEWS_CLIENT_ID')
 ASKNEWS_CLIENT_SECRET = os.environ.get('ASKNEWS_CLIENT_SECRET')
-query = "Tennis ATP Ugo Humbert VS Alexander Shevchenko 2024-07-01 07:46:00-04:00"
+query = "Detroit Tigers vs Los Angeles Angels 2024-08-27 18:40:00-04:00"
 start = (datetime.now() - timedelta(hours=48)).timestamp()
 end = datetime.now().timestamp()
 
