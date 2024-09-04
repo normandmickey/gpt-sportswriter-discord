@@ -45,6 +45,10 @@ dataSportKeys = requests.get(f"https://api.the-odds-api.com/v4/sports/?apiKey={O
 dataSportKeys = dataSportKeys.json()
 sport_keys = []
 leagues = []
+soccer_sport_keys = []
+soccer_leagues = []
+soccerSports = ['Soccer']
+excludedSoccerLeagues = []
 includedSports = ['American Football',
                   'Aussie Rules',
                   'Baseball',
@@ -106,6 +110,15 @@ for i in range(len(dataSportKeys)):
 sport_keys = [i for n, i in enumerate(sport_keys) if i not in sport_keys[:n]]
 leagues = [i for n, i in enumerate(leagues) if i not in leagues[:n]]
 
+for i in range(len(dataSportKeys)):
+    if (dataSportKeys[i]['has_outrights'] is False and dataSportKeys[i]['group'] in soccerSports and dataSportKeys[i]['key'] not in excludedSoccerLeagues):
+       soccer_sport_keys.append(dataSportKeys[i]['key'])
+       soccer_leagues.append(dataSportKeys[i]['description'])
+
+soccer_sport_keys = [i for n, i in enumerate(soccer_sport_keys) if i not in soccer_sport_keys[:n]]
+soccer_leagues = [i for n, i in enumerate(soccer_leagues) if i not in soccer_leagues[:n]]
+
+
 groq_client = Groq(
     api_key=os.environ.get("GROQ_API_KEY"),
 )
@@ -150,7 +163,7 @@ def createMessage(sport_key, text):
     messages = []
     messages.append({"role": "system", "content": "You are the worlds best AI Sports Handicapper and sportswriter. You are smart, funny and accurate. Limit your response to 1500 characters or less."})
     messages.append({"role": "user", "content": match})
-    dataGames = requests.get(f"https://api.the-odds-api.com/v4/sports/{sport_key}/odds/?apiKey={ODDS_API_KEY}&eventIds={gameId}&regions=us&markets=totals,h2h,spreads&bookmakers=draftkings,fanduel,betrivers&oddsFormat=american")
+    dataGames = requests.get(f"https://api.the-odds-api.com/v4/sports/{sport_key}/odds/?apiKey={ODDS_API_KEY}&eventIds={gameId}&regions=us&markets=totals,h2h,spreads&bookmakers=draftkings,fanduel,betrivers&oddsFormat=decimal")
     odds = str(dataGames.json())
     try:
       context = ask.news.search_news(match, method='kw', return_type='string', n_articles=10, categories=["Sports"], start_timestamp=int(start), end_timestamp=int(end)).as_string
@@ -266,7 +279,7 @@ def answerTrivia(text):
 
 async def get_sport(ctx: discord.AutocompleteContext):
   sport = ctx.options['sport']
-  dataGames = requests.get(f"https://api.the-odds-api.com/v4/sports/{sport}/odds/?apiKey={ODDS_API_KEY}&regions=us&markets=totals&bookmakers=draftkings&oddsFormat=american")
+  dataGames = requests.get(f"https://api.the-odds-api.com/v4/sports/{sport}/odds/?apiKey={ODDS_API_KEY}&regions=us&markets=totals&bookmakers=draftkings&oddsFormat=decimal")
   dataGames = dataGames.json()
   games = []
   for i in range(len(dataGames)):
@@ -314,6 +327,15 @@ async def on_ready():
 async def prediction_command(
   ctx: discord.ApplicationContext,
   sport: discord.Option(str, choices=sport_keys),
+  game: discord.Option(str, autocomplete=discord.utils.basic_autocomplete(get_sport))
+):
+  await ctx.defer()
+  await ctx.respond((createMessage(f"{sport}", f"{game}"))[:2000])
+
+@bot.slash_command(name="soccer", description="Up to date AI generated predictions for soccer leagues")
+async def soccer_command(
+  ctx: discord.ApplicationContext,
+  sport: discord.Option(str, choices=soccer_sport_keys),
   game: discord.Option(str, autocomplete=discord.utils.basic_autocomplete(get_sport))
 ):
   await ctx.defer()
