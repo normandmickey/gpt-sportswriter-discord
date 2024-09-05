@@ -332,10 +332,10 @@ async def prediction_command(
   await ctx.defer()
   await ctx.respond((createMessage(f"{sport}", f"{game}"))[:2000])
 
-@bot.slash_command(name="soccerprediction", description="Up to date AI generated predictions for soccer leagues.")
+@bot.slash_command(name="soccerprediction", description="Up to date AI generated predictions on sporting events.")
 async def soccerprediction_command(
   ctx: discord.ApplicationContext,
-  sport: discord.Option(str, choices=soccer_sport_keys),
+  sport: discord.Option(str, choices=sport_keys),
   game: discord.Option(str, autocomplete=discord.utils.basic_autocomplete(get_sport))
 ):
   await ctx.defer()
