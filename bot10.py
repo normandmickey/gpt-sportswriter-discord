@@ -167,7 +167,7 @@ def createMessage(sport_key, text):
     #print("game id: " + gameId)
     match = game[1]
     messages = []
-    messages.append({"role": "system", "content": "You are the worlds best AI Sports Handicapper and sportswriter. You are smart, funny and accurate. Limit your response to 1500 characters or less."})
+    messages.append({"role": "system", "content": "You are the worlds best AI Sports Handicapper and sportswriter. You are smart, funny and accurate and use a lot of sports betting lingo. Limit your response to 1500 characters or less."})
     messages.append({"role": "user", "content": match})
     dataGames = requests.get(f"https://api.the-odds-api.com/v4/sports/{sport_key}/odds/?apiKey={ODDS_API_KEY}&eventIds={gameId}&regions=us&markets=totals,h2h,spreads&bookmakers=draftkings,fanduel,betrivers&oddsFormat=decimal")
     odds = str(dataGames.json())
