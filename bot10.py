@@ -23,7 +23,7 @@ utc = pytz.utc
 # str format
 #fmt = '%Y-%m-%d %H:%M:%S %Z%z'
 fmt = '%Y-%m-%d'
-GROQ_GPT_MODEL = "llama-3.1-70b-Versatile"
+GROQ_GPT_MODEL = "llama-3.1-8b-instant"
 OPENAI_GPT_MODEL = "gpt-4"
 ODDS_API_KEY = os.environ.get('ODDS_API_KEY')
 ASKNEWS_CLIENT_ID = os.environ.get('ASKNEWS_CLIENT_ID')
