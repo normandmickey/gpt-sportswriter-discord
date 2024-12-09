@@ -172,7 +172,10 @@ def createMessage(sport_key, text):
     dataGames = requests.get(f"https://api.the-odds-api.com/v4/sports/{sport_key}/odds/?apiKey={ODDS_API_KEY}&eventIds={gameId}&regions=us&markets=totals,h2h,spreads&bookmakers=draftkings,fanduel,betrivers&oddsFormat=decimal")
     odds = str(dataGames.json())
     try:
-      context = ask.news.search_news(match, method='kw', return_type='string', n_articles=3, categories=["Sports"], start_timestamp=int(start), end_timestamp=int(end)).as_string
+      newsArticles = ask.news.search_news(match, method='kw', return_type='dict', n_articles=3, categories=["Sports"], start_timestamp=int(start), end_timestamp=int(end)).as_dicts
+      context = ""
+      for article in newsArticles:
+        context += article.summary
       #print("Odds: " + odds)
       #print("AskNews: " + context)
     except:
@@ -202,7 +205,10 @@ def createProp(sport_key, text):
     messages.append({"role": "system", "content": "You are the worlds best AI Sports Handicapper and sportswriter. You are smart, funny and accurate."})
     messages.append({"role": "user", "content": text})
     try:
-      context = ask.news.search_news("best prop bets for the text " + match, method='kw', return_type='string', n_articles=3, categories=["Sports"], start_timestamp=int(start), end_timestamp=int(end)).as_string
+      newsArticles = ask.news.search_news("best prop bets for the text " + match, method='kw', return_type='dict', n_articles=3, categories=["Sports"], start_timestamp=int(start), end_timestamp=int(end)).as_dicts
+      context = ""
+      for article in newsArticles:
+        context += article.summary
       #print(context)
     except:
       context = ""
@@ -219,7 +225,10 @@ def createParlay(sport_key, text):
     messages.append({"role": "system", "content": "You are the worlds best AI Sports Handicapper and sportswriter. You are smart, funny and accurate."})
     messages.append({"role": "user", "content": text})
     try:
-      context = ask.news.search_news("same game parlay " + text, method='kw', return_type='string', n_articles=3, categories=["Sports"], start_timestamp=int(start), end_timestamp=int(end)).as_string
+      newsArticles = ask.news.search_news("same game parlay " + text, method='kw', return_type='dict', n_articles=3, categories=["Sports"], start_timestamp=int(start), end_timestamp=int(end)).as_dicts
+      context = ""
+      for article in newsArticles:
+        context += article.summary
       #print(context)
     except:
       context = ""
@@ -236,7 +245,10 @@ def topNews(sport_key):
     messages.append({"role": "system", "content": "You are the worlds best AI Sports Handicapper and sportswriter. You are smart, funny and accurate."})
     messages.append({"role": "user", "content": sport_key})
     try:
-      context = ask.news.search_news(sport_key, method="kw", return_type='string', n_articles=3, categories=["Sports"], start_timestamp=int(start), end_timestamp=int(end)).as_string
+      newsArticles = ask.news.search_news(sport_key, method="kw", return_type='dict', n_articles=3, categories=["Sports"], start_timestamp=int(start), end_timestamp=int(end)).as_dicts
+      context = ""
+      for article in newsArticles:
+        context += article.summary
       #print(context)
     except:
       context = ""
@@ -254,7 +266,10 @@ def createRecap(sport_key, text):
     messages.append({"role": "system", "content": "You are the worlds best AI Sports Handicapper and sportswriter. You are smart, funny and accurate."})
     messages.append({"role": "user", "content": text})
     try:
-        context = ask.news.search_news("final score of the following game " + text, method='kw', return_type='string', n_articles=3, categories=["Sports"], start_timestamp=int(start), end_timestamp=int(end)).as_string
+        newsArticles = ask.news.search_news("final score of the following game " + text, method='kw', return_type='dict', n_articles=3, categories=["Sports"], start_timestamp=int(start), end_timestamp=int(end)).as_dicts
+        context = ""
+        for article in newsArticles:
+          context += article.summary
     except:
         context = ""
     #print(context)
