@@ -57,12 +57,10 @@ excludedSoccerLeagues = []
 
 includedSports = ['American Football',
                   'Aussie Rules',
-                  'Baseball',
                   'Basketball',
                   'Boxing',
                   'Ice Hockey',
                   'Mixed Martial Arts',
-                  'Politics',
                   'Rugby League',
                   'Soccer',
                   'Tennis']
@@ -93,6 +91,9 @@ excludedLeagues = ['icehockey_sweden_hockey_league',
                    'soccer_england_league2',
                    'soccer_france_ligue_one',
                    'soccer_netherlands_eredivisie',
+                   'soccer_turkey_super_league',
+                   'soccer_uefa_champs_league_qualification',
+                   'soccer_ufea_europa_conference_league',
                    'soccer_spl',
                    'baseball_milb',
                    'baseball_npb',
@@ -173,9 +174,9 @@ def createMessage(sport_key, text):
     odds = str(dataGames.json())
     try:
       newsArticles = ask.news.search_news(match, method='kw', return_type='dicts', n_articles=3, categories=["Sports"], premium=True, start_timestamp=int(start), end_timestamp=int(end)).as_dicts
-      context = ""
       for article in newsArticles:
         context += article.summary
+        #print(article.summary)
       #print("Odds: " + odds)
       #print("AskNews: " + context)
     except:
@@ -196,7 +197,6 @@ def createMessage(sport_key, text):
 def createProp(sport_key, text):
     start = (datetime.now() - timedelta(hours=48)).timestamp()
     end = datetime.now().timestamp()
-    context = ""
     game = text.split(':')
     gameId = game[0]
     #print("game id: " + gameId)
