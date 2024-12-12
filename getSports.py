@@ -1,8 +1,12 @@
-
-import requests
+import requests, os
 import json
+from dotenv import load_dotenv
 
-dataSportKeys = requests.get(f"https://api.the-odds-api.com/v4/sports/?apiKey=423c9b035eb2895971334e33f706c949")
+load_dotenv()
+
+ODDS_API_KEY = os.environ.get('ODDS_API_KEY')
+
+dataSportKeys = requests.get(f"https://api.the-odds-api.com/v4/sports/?apiKey={ODDS_API_KEY}")
 dataSportKeys = dataSportKeys.json()
 
 sport_keys = []
