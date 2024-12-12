@@ -49,12 +49,6 @@ dataSportKeys = dataSportKeys.json()
 sport_keys = []
 leagues = []
 
-soccer_sport_keys = []
-soccer_leagues = []
-
-includedSoccerSports = ['Soccer']
-excludedSoccerLeagues = []
-
 includedSports = ['American Football',
                   'Aussie Rules',
                   'Basketball',
@@ -116,14 +110,6 @@ for i in range(len(dataSportKeys)):
 
 sport_keys = [i for n, i in enumerate(sport_keys) if i not in sport_keys[:n]]
 leagues = [i for n, i in enumerate(leagues) if i not in leagues[:n]]
-
-for i in range(len(dataSportKeys)):
-    if (dataSportKeys[i]['has_outrights'] is False and dataSportKeys[i]['group'] in includedSoccerSports and dataSportKeys[i]['key'] not in excludedSoccerLeagues):
-       soccer_sport_keys.append(dataSportKeys[i]['key'])
-       soccer_leagues.append(dataSportKeys[i]['description'])
-
-soccer_sport_keys = [i for n, i in enumerate(soccer_sport_keys) if i not in soccer_sport_keys[:n]]
-soccer_leagues = [i for n, i in enumerate(soccer_leagues) if i not in soccer_leagues[:n]]
 
 
 groq_client = Groq(
@@ -348,15 +334,6 @@ async def on_ready():
 async def prediction_command(
   ctx: discord.ApplicationContext,
   sport: discord.Option(str, choices=sport_keys),
-  game: discord.Option(str, autocomplete=discord.utils.basic_autocomplete(get_sport))
-):
-  await ctx.defer()
-  await ctx.respond((createMessage(f"{sport}", f"{game}"))[:2000])
-
-@bot.slash_command(name="soccerprediction", description="Up to date AI generated predictions on sporting events.")
-async def soccerprediction_command(
-  ctx: discord.ApplicationContext,
-  sport: discord.Option(str, choices=soccer_sport_keys),
   game: discord.Option(str, autocomplete=discord.utils.basic_autocomplete(get_sport))
 ):
   await ctx.defer()
