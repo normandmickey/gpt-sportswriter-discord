@@ -347,8 +347,8 @@ async def prediction_command(
   game: discord.Option(str, autocomplete=discord.utils.basic_autocomplete(get_sport))
 ):
   prediction=createMessage(f"{sport}", f"{game}")[:2000]
-  embed=discord.Embed(title=f"{game}", url="https://record.revmasters.com/_8ejz3pKmFDuMKNOJN2Xw7mNd7ZgqdRLk/1/",description=prediction)
-  await ctx.defer()
+  embed=discord.Embed(title=f"{game}", url="https://record.revmasters.com/_8ejz3pKmFDuMKNOJN2Xw7mNd7ZgqdRLk/1/",description=prediction, image="https://media.revmasters.com/uploads/002xnbaseason24-970x250-aff.gif")
+  await ctx.defer() 
   await ctx.send(embed=embed)
 
 @bot.slash_command(name="props", description="Best Prop Bets.")
