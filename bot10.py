@@ -43,6 +43,7 @@ ask = AskNewsSDK(
 #referral_links = ["BetUS - 125% Sign Up Bonus! - https://record.revmasters.com/_8ejz3pKmFDsdHrf4TDP9mWNd7ZgqdRLk/1/","https://cash.app The CashApp is the best way to send money for free. Enter the code WPVJMVS when you sign up and we'll send you $5 when you try it.","https://www.draftkings.com/r/normandmickey","Get $50 on FanDuel Sportsbook in Bonus Bets! Terms apply. Make sure to use my invite link! https://fndl.co/jcafr4b","https://www.ny.betmgm.com/en/mobileportal/invitefriendssignup?invID=5387173","https://caesars.com/sportsbook-and-casino/referral?AR=RAF-BEG-AAV","https://fanatics.onelink.me/5kut/xxyt95qs"]
 #referral_links = ["BetUS - 125% Sign Up Bonus! - https://tinyurl.com/GPTSW2","https://cash.app The CashApp is the best way to send money for free. Enter the code WPVJMVS when you sign up and we'll send you $5 when you try it."]
 referral_links = ["BetUS - 125% Sign Up Bonus! - https://record.revmasters.com/_8ejz3pKmFDtD3TEmsPWI0WNd7ZgqdRLk/1/"]
+https://record.revmasters.com/_8ejz3pKmFDuMKNOJN2Xw7mNd7ZgqdRLk/1/
 
 dataSportKeys = requests.get(f"https://api.the-odds-api.com/v4/sports/?apiKey={ODDS_API_KEY}")
 dataSportKeys = dataSportKeys.json()
@@ -331,14 +332,25 @@ async def on_ready():
 #            await asyncio.sleep(10)
 #        await asyncio.sleep(900)
 
+#@bot.slash_command(name="prediction", description="Up to date AI generated predictions on sporting events.")
+#async def prediction_command(
+#  ctx: discord.ApplicationContext,
+#  sport: discord.Option(str, choices=sport_keys),
+#  game: discord.Option(str, autocomplete=discord.utils.basic_autocomplete(get_sport))
+#):
+#  await ctx.defer()
+#  await ctx.respond((createMessage(f"{sport}", f"{game}"))[:2000])
+
 @bot.slash_command(name="prediction", description="Up to date AI generated predictions on sporting events.")
 async def prediction_command(
   ctx: discord.ApplicationContext,
   sport: discord.Option(str, choices=sport_keys),
   game: discord.Option(str, autocomplete=discord.utils.basic_autocomplete(get_sport))
 ):
+  prediction=createMessage(f"{sport}", f"{game}")[:2000]
+  embed=discord.Embed(title=f"{game}", url="https://record.revmasters.com/_8ejz3pKmFDuMKNOJN2Xw7mNd7ZgqdRLk/1/",description=prediction)
   await ctx.defer()
-  await ctx.respond((createMessage(f"{sport}", f"{game}"))[:2000])
+  await ctx.send(embed=embed)
 
 @bot.slash_command(name="props", description="Best Prop Bets.")
 async def props_command(
