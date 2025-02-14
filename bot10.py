@@ -40,9 +40,9 @@ ask = AskNewsSDK(
         scopes=["news"]
 )
 
-#referral_links = ["BetUS - 125% Sign Up Bonus! - https://record.revmasters.com/_8ejz3pKmFDsdHrf4TDP9mWNd7ZgqdRLk/1/","https://cash.app The CashApp is the best way to send money for free. Enter the code WPVJMVS when you sign up and we'll send you $5 when you try it.","https://www.draftkings.com/r/normandmickey","Get $50 on FanDuel Sportsbook in Bonus Bets! Terms apply. Make sure to use my invite link! https://fndl.co/jcafr4b","https://www.ny.betmgm.com/en/mobileportal/invitefriendssignup?invID=5387173","https://caesars.com/sportsbook-and-casino/referral?AR=RAF-BEG-AAV","https://fanatics.onelink.me/5kut/xxyt95qs"]
+referral_links = ["BetUS - 125% Sign Up Bonus! - https://record.revmasters.com/_8ejz3pKmFDsdHrf4TDP9mWNd7ZgqdRLk/1/","https://cash.app The CashApp is the best way to send money for free. Enter the code WPVJMVS when you sign up and we'll send you $5 when you try it.","https://www.draftkings.com/r/normandmickey","Get $50 on FanDuel Sportsbook in Bonus Bets! Terms apply. Make sure to use my invite link! https://fndl.co/jcafr4b","https://www.ny.betmgm.com/en/mobileportal/invitefriendssignup?invID=5387173","https://caesars.com/sportsbook-and-casino/referral?AR=RAF-BEG-AAV","https://fanatics.onelink.me/5kut/xxyt95qs"]
 #referral_links = ["BetUS - 125% Sign Up Bonus! - https://tinyurl.com/GPTSW2","https://cash.app The CashApp is the best way to send money for free. Enter the code WPVJMVS when you sign up and we'll send you $5 when you try it."]
-referral_links = ["BetUS - 125% Sign Up Bonus! - https://record.revmasters.com/_8ejz3pKmFDtD3TEmsPWI0WNd7ZgqdRLk/1/"]
+#referral_links = ["BetUS - 125% Sign Up Bonus! - https://record.revmasters.com/_8ejz3pKmFDtD3TEmsPWI0WNd7ZgqdRLk/1/"]
 
 dataSportKeys = requests.get(f"https://api.the-odds-api.com/v4/sports/?apiKey={ODDS_API_KEY}")
 dataSportKeys = dataSportKeys.json()
@@ -357,8 +357,10 @@ async def props_command(
   sport: discord.Option(str, choices=sport_keys),
   game: discord.Option(str, autocomplete=discord.utils.basic_autocomplete(get_sport))
 ):
+  prop = createProp(f"{sport}", f"{game}")[:2000]
+  embed=discord.Embed(title="BetUS - 125% Sign Up Bonus!", url="https://record.revmasters.com/_8ejz3pKmFDuMKNOJN2Xw7mNd7ZgqdRLk/1/",description=prop, image="https://media.revmasters.com/uploads/002xnbaseason24-970x250-aff.gif")
   await ctx.defer()
-  await ctx.respond((createProp(f"{sport}", f"{game}"))[:2000])
+  await ctx.respond(embed=embed)
 
 @bot.slash_command(name="samegameparlay", description="Best Same Game Parlay.")
 async def samegameparlay_command(
@@ -366,16 +368,20 @@ async def samegameparlay_command(
   sport: discord.Option(str, choices=sport_keys),
   game: discord.Option(str, autocomplete=discord.utils.basic_autocomplete(get_sport))
 ):
+  parlay = createParlay(f"{sport}", f"{game}")[:2000]
+  embed=discord.Embed(title="BetUS - 125% Sign Up Bonus!", url="https://record.revmasters.com/_8ejz3pKmFDuMKNOJN2Xw7mNd7ZgqdRLk/1/",description=parlay, image="https://media.revmasters.com/uploads/002xnbaseason24-970x250-aff.gif")
   await ctx.defer()
-  await ctx.respond((createParlay(f"{sport}", f"{game}"))[:2000])
+  await ctx.respond(embed=embed)
 
 @bot.slash_command(name="topnews", description="Latest news by sport.")
 async def topnews_command(
   ctx: discord.ApplicationContext,
   sport: discord.Option(str, choices=leagues),
 ):
+  news = topNews(f"{sport}")[:2000]
+  embed=discord.Embed(title="BetUS - 125% Sign Up Bonus!", url="https://record.revmasters.com/_8ejz3pKmFDuMKNOJN2Xw7mNd7ZgqdRLk/1/",description=news, image="https://media.revmasters.com/uploads/002xnbaseason24-970x250-aff.gif")
   await ctx.defer()
-  await ctx.respond((topNews(f"{sport}"))[:2000])
+  await ctx.respond(embed=embed)
 
 @bot.slash_command(name="recap", description="Get highlights of recent matches.")
 async def recap_command(
@@ -383,16 +389,20 @@ async def recap_command(
   sport: discord.Option(str, choices=sport_keys),
   game: discord.Option(str, autocomplete=discord.utils.basic_autocomplete(get_score))
 ):
+  recap = createRecap(f"{sport}", f"{game}")[:2000]
+  embed=discord.Embed(title="BetUS - 125% Sign Up Bonus!", url="https://record.revmasters.com/_8ejz3pKmFDuMKNOJN2Xw7mNd7ZgqdRLk/1/",description=recap, image="https://media.revmasters.com/uploads/002xnbaseason24-970x250-aff.gif")
   await ctx.defer()
-  await ctx.respond((createRecap(f"{sport}", f"{game}"))[:2000])
+  await ctx.respond(embed=embed)
 
 @bot.slash_command(name="trivia", description="Ask me any anything sport related.")
 async def trivia_command(
   ctx: discord.ApplicationContext,
   question: discord.Option(str)
 ):
+  trivia = answerTrivia(f"{question}")[:2000]
+  embed=discord.Embed(title="BetUS - 125% Sign Up Bonus!", url="https://record.revmasters.com/_8ejz3pKmFDuMKNOJN2Xw7mNd7ZgqdRLk/1/",description=trivia, image="https://media.revmasters.com/uploads/002xnbaseason24-970x250-aff.gif")
   await ctx.defer()
-  await ctx.respond((f"{question}" + ":\n" + answerTrivia(f"{question}"))[:2000])
+  await ctx.respond(embed=embed)
 
 bot.run(os.environ.get('DISCORD_BOT_TOKEN')) # run the bot with the token
 
