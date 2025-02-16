@@ -352,10 +352,10 @@ async def prediction_command(
   sport: discord.Option(str, choices=sport_keys),
   game: discord.Option(str, autocomplete=discord.utils.basic_autocomplete(get_sport))
 ):
+  await ctx.defer() 
   prediction = createMessage(f"{sport}", f"{game}")[:2000]
   embed=discord.Embed(title="BetUS - 125% Sign Up Bonus!", url="https://record.revmasters.com/_8ejz3pKmFDuMKNOJN2Xw7mNd7ZgqdRLk/1/",description=prediction, image="https://media.revmasters.com/uploads/002xnbaseason24-970x250-aff.gif")
   embed.add_field(name='BetUS - 125% Bonus On Your First 3 Deposits' ,value='[Click here to Sign Up]( https://record.revmasters.com/_8ejz3pKmFDsdHrf4TDP9mWNd7ZgqdRLk/1/ )', inline=False)
-  await ctx.defer() 
   await ctx.respond(embed=embed)
 
 @bot.slash_command(name="props", description="Best Prop Bets.")
@@ -364,10 +364,10 @@ async def props_command(
   sport: discord.Option(str, choices=sport_keys),
   game: discord.Option(str, autocomplete=discord.utils.basic_autocomplete(get_sport))
 ):
+  await ctx.defer()
   prop = createProp(f"{sport}", f"{game}")[:2000]
   embed=discord.Embed(title="BetUS - 125% Sign Up Bonus!", url="https://record.revmasters.com/_8ejz3pKmFDuMKNOJN2Xw7mNd7ZgqdRLk/1/",description=prop, image="https://media.revmasters.com/uploads/002xnbaseason24-970x250-aff.gif")
   embed.add_field(name='BetUS - 125% Bonus On Your First 3 Deposits' ,value='[Click here to Sign Up]( https://record.revmasters.com/_8ejz3pKmFDsdHrf4TDP9mWNd7ZgqdRLk/1/ )', inline=False)
-  await ctx.defer()
   await ctx.respond(embed=embed)
 
 @bot.slash_command(name="samegameparlay", description="Best Same Game Parlay.")
@@ -376,10 +376,10 @@ async def samegameparlay_command(
   sport: discord.Option(str, choices=sport_keys),
   game: discord.Option(str, autocomplete=discord.utils.basic_autocomplete(get_sport))
 ):
+  await ctx.defer()
   parlay = createParlay(f"{sport}", f"{game}")[:2000]
   embed=discord.Embed(title="BetUS - 125% Sign Up Bonus!", url="https://record.revmasters.com/_8ejz3pKmFDuMKNOJN2Xw7mNd7ZgqdRLk/1/",description=parlay, image="https://media.revmasters.com/uploads/002xnbaseason24-970x250-aff.gif")
   embed.add_field(name='BetUS - 125% Bonus On Your First 3 Deposits' ,value='[Click here to Sign Up]( https://record.revmasters.com/_8ejz3pKmFDsdHrf4TDP9mWNd7ZgqdRLk/1/ )', inline=False)
-  await ctx.defer()
   await ctx.respond(embed=embed)
 
 @bot.slash_command(name="topnews", description="Latest news by sport.")
@@ -387,10 +387,10 @@ async def topnews_command(
   ctx: discord.ApplicationContext,
   sport: discord.Option(str, choices=leagues),
 ):
+  await ctx.defer()
   news = topNews(f"{sport}")[:2000]
   embed=discord.Embed(title="BetUS - 125% Sign Up Bonus!", url="https://record.revmasters.com/_8ejz3pKmFDuMKNOJN2Xw7mNd7ZgqdRLk/1/",description=news, image="https://media.revmasters.com/uploads/002xnbaseason24-970x250-aff.gif")
   embed.add_field(name='BetUS - 125% Bonus On Your First 3 Deposits' ,value='[Click here to Sign Up]( https://record.revmasters.com/_8ejz3pKmFDsdHrf4TDP9mWNd7ZgqdRLk/1/ )', inline=False)
-  await ctx.defer()
   await ctx.respond(embed=embed)
 
 @bot.slash_command(name="recap", description="Get highlights of recent matches.")
@@ -399,10 +399,10 @@ async def recap_command(
   sport: discord.Option(str, choices=sport_keys),
   game: discord.Option(str, autocomplete=discord.utils.basic_autocomplete(get_score))
 ):
+  await ctx.defer()
   recap = createRecap(f"{sport}", f"{game}")[:2000]
   embed=discord.Embed(title="BetUS - 125% Sign Up Bonus!", url="https://record.revmasters.com/_8ejz3pKmFDuMKNOJN2Xw7mNd7ZgqdRLk/1/",description=recap, image="https://media.revmasters.com/uploads/002xnbaseason24-970x250-aff.gif")
   embed.add_field(name='BetUS - 125% Bonus On Your First 3 Deposits' ,value='[Click here to Sign Up]( https://record.revmasters.com/_8ejz3pKmFDsdHrf4TDP9mWNd7ZgqdRLk/1/ )', inline=False)
-  await ctx.defer()
   await ctx.respond(embed=embed)
 
 @bot.slash_command(name="trivia", description="Ask me any anything sport related.")
@@ -410,10 +410,10 @@ async def trivia_command(
   ctx: discord.ApplicationContext,
   question: discord.Option(str)
 ):
+  await ctx.defer()
   trivia = answerTrivia(f"{question}")[:2000]
   embed=discord.Embed(title="BetUS - 125% Sign Up Bonus!", url="https://record.revmasters.com/_8ejz3pKmFDuMKNOJN2Xw7mNd7ZgqdRLk/1/",description=trivia, image="https://media.revmasters.com/uploads/002xnbaseason24-970x250-aff.gif")
   embed.add_field(name='BetUS - 125% Bonus On Your First 3 Deposits' ,value='[Click here to Sign Up]( https://record.revmasters.com/_8ejz3pKmFDsdHrf4TDP9mWNd7ZgqdRLk/1/ )', inline=False)
-  await ctx.defer()
   await ctx.respond(embed=embed)
 
 bot.run(os.environ.get('DISCORD_BOT_TOKEN')) # run the bot with the token
