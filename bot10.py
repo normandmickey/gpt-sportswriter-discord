@@ -401,7 +401,7 @@ async def trivia_command(
 ):
   trivia = answerTrivia(f"{question}")[:2000]
   embed=discord.Embed(title="BetUS - 125% Sign Up Bonus!", url="https://record.revmasters.com/_8ejz3pKmFDuMKNOJN2Xw7mNd7ZgqdRLk/1/",description=trivia, image="https://media.revmasters.com/uploads/002xnbaseason24-970x250-aff.gif")
-  embed.add_field(name='If you wish to add me in your server,' ,value='[Click here to add]( https://www.gptsportswriter.com )', inline=False)
+  embed.add_field(name='125% Bonus On Your First 3 Deposits' ,value='[Click here to Sign Up]( https://record.revmasters.com/_8ejz3pKmFDsdHrf4TDP9mWNd7ZgqdRLk/1/ )', inline=False)
   await ctx.defer()
   await ctx.respond(embed=embed)
 
