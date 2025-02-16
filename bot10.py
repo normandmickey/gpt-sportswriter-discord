@@ -400,7 +400,7 @@ async def trivia_command(
   question: discord.Option(str)
 ):
   trivia = answerTrivia(f"{question}")[:2000]
-  embed=discord.Embed(title="BetUS - 125% Sign Up Bonus!", url="https://record.revmasters.com/_8ejz3pKmFDuMKNOJN2Xw7mNd7ZgqdRLk/1/",description=trivia, image="https://media.revmasters.com/uploads/002xnbaseason24-970x250-aff.gif")
+  embed=discord.Embed(title="BetUS - 125% Sign Up Bonus!", url="https://record.revmasters.com/_8ejz3pKmFDuMKNOJN2Xw7mNd7ZgqdRLk/1/",description=trivia).set_image(url="https://media.revmasters.com/uploads/002xnbaseason24-970x250-aff.gif")
   await ctx.defer()
   await ctx.respond(embed=embed)
 
