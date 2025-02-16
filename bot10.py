@@ -177,7 +177,8 @@ def createMessage(sport_key, text):
       #print("Tavily: " + context)
     messages.append({"role": "user", "content": "Write a brief, humorous article outlining the odds and statistics for the following matchup.  Give your best bet based on the context provided take into account that underdogs win about 41 percent of the time in baseball and hockey, 35 percent in football and 25 percent in baskeball.  Your article should contain as much detail and statistics as possible yet humorous and sarcastic. Do not make anything up, if the context doesn't contain information relevant to the question politely and  humorously refuse to give a prediction. If the context is not relevant to the question politely refuse to answer the question. Your response should be in markdown format. Be funny and sarcastic." + context + " " + odds + " " + match})
     chat_response = chat_completion_request(messages)
-    reply = chat_response.choices[0].message.content + "\n" + random.choice(referral_links)
+    #reply = chat_response.choices[0].message.content + "\n" + random.choice(referral_links)
+    reply = chat_response.choices[0].message.content
     #print(reply)
     return reply
 
@@ -201,7 +202,8 @@ def createProp(sport_key, text):
       context = ""
     messages.append({"role": "user", "content": "Write a short article outlining the best individual player prop bets for the following matchup. List the odds and probability.  Give your best bet based on the context provided only mention play prop bets that are referenced in the context and mention the sportsbook.  The response should be in markdown format." + context + " " + match})
     chat_response = chat_completion_request(messages)
-    reply = chat_response.choices[0].message.content + "\n" + random.choice(referral_links)
+    #reply = chat_response.choices[0].message.content + "\n" + random.choice(referral_links)
+    reply = chat_response.choices[0].message.content
     #print(reply)
     return reply
 
@@ -221,7 +223,8 @@ def createParlay(sport_key, text):
       context = ""
     messages.append({"role": "user", "content": "Write a short article outlining the best same game parlay for the following matchup. List the odds and probability.  Give your best bet based on the context provided only mention parlays referenced in the context and include the sportsbook. Your response should be in markdown format." + context + " " + text})
     chat_response = chat_completion_request(messages)
-    reply = chat_response.choices[0].message.content + "\n" + random.choice(referral_links)
+    #reply = chat_response.choices[0].message.content + "\n" + random.choice(referral_links)
+    reply = chat_response.choices[0].message.content
     #print(reply)
     return reply
 
@@ -241,7 +244,8 @@ def topNews(sport_key):
       context = ""
     messages.append({"role": "user", "content": "Write a funny, but accurate article briefly summarizing the various articles. Each article is enclosed in the <doc> </doc> tag.  Ignore redundant articles. Your response should be in markdown format." + context + " " + sport_key}),
     chat_response = chat_completion_request(messages)
-    reply = chat_response.choices[0].message.content + "\n" + random.choice(referral_links)
+    #reply = chat_response.choices[0].message.content + "\n" + random.choice(referral_links)
+    reply = chat_response.choices[0].message.content
     #print(reply)
     return reply
 
@@ -263,7 +267,8 @@ def createRecap(sport_key, text):
     #print(text)
     messages.append({"role": "user", "content": "Write a short, humorous article recapping the results following matchup include the score and highlights. Pay specific attention to the articles and only include information from context provided that is related to the game in question do not make up any details. Your response should be in markdown format. " + context + " " + text})
     chat_response = chat_completion_request(messages)
-    reply = chat_response.choices[0].message.content + "\n" + random.choice(referral_links)
+    #reply = chat_response.choices[0].message.content + "\n" + random.choice(referral_links)
+    reply = chat_response.choices[0].message.content
     #print(reply)
     return reply
 
@@ -281,7 +286,8 @@ def answerTrivia(text):
     #print(context)
     messages.append({"role": "user", "content": "Given the following context answer the sports trivia question at the end.  Be humorous but accurate.  If the question is not sports related, politely refuse to answer. Your response should be in markdown format." + context + " " + text})
     chat_response = chat_completion_request(messages)
-    reply = chat_response.choices[0].message.content + "\n" + random.choice(referral_links)
+    #reply = chat_response.choices[0].message.content + "\n" + random.choice(referral_links)
+    reply = chat_response.choices[0].message.content
     #print(reply)
     return reply
 
@@ -348,6 +354,7 @@ async def prediction_command(
 ):
   prediction = createMessage(f"{sport}", f"{game}")[:2000]
   embed=discord.Embed(title="BetUS - 125% Sign Up Bonus!", url="https://record.revmasters.com/_8ejz3pKmFDuMKNOJN2Xw7mNd7ZgqdRLk/1/",description=prediction, image="https://media.revmasters.com/uploads/002xnbaseason24-970x250-aff.gif")
+  embed.add_field(name='BetUS - 125% Bonus On Your First 3 Deposits' ,value='[Click here to Sign Up]( https://record.revmasters.com/_8ejz3pKmFDsdHrf4TDP9mWNd7ZgqdRLk/1/ )', inline=False)
   await ctx.defer() 
   await ctx.respond(embed=embed)
 
@@ -359,6 +366,7 @@ async def props_command(
 ):
   prop = createProp(f"{sport}", f"{game}")[:2000]
   embed=discord.Embed(title="BetUS - 125% Sign Up Bonus!", url="https://record.revmasters.com/_8ejz3pKmFDuMKNOJN2Xw7mNd7ZgqdRLk/1/",description=prop, image="https://media.revmasters.com/uploads/002xnbaseason24-970x250-aff.gif")
+  embed.add_field(name='BetUS - 125% Bonus On Your First 3 Deposits' ,value='[Click here to Sign Up]( https://record.revmasters.com/_8ejz3pKmFDsdHrf4TDP9mWNd7ZgqdRLk/1/ )', inline=False)
   await ctx.defer()
   await ctx.respond(embed=embed)
 
@@ -370,6 +378,7 @@ async def samegameparlay_command(
 ):
   parlay = createParlay(f"{sport}", f"{game}")[:2000]
   embed=discord.Embed(title="BetUS - 125% Sign Up Bonus!", url="https://record.revmasters.com/_8ejz3pKmFDuMKNOJN2Xw7mNd7ZgqdRLk/1/",description=parlay, image="https://media.revmasters.com/uploads/002xnbaseason24-970x250-aff.gif")
+  embed.add_field(name='BetUS - 125% Bonus On Your First 3 Deposits' ,value='[Click here to Sign Up]( https://record.revmasters.com/_8ejz3pKmFDsdHrf4TDP9mWNd7ZgqdRLk/1/ )', inline=False)
   await ctx.defer()
   await ctx.respond(embed=embed)
 
@@ -380,6 +389,7 @@ async def topnews_command(
 ):
   news = topNews(f"{sport}")[:2000]
   embed=discord.Embed(title="BetUS - 125% Sign Up Bonus!", url="https://record.revmasters.com/_8ejz3pKmFDuMKNOJN2Xw7mNd7ZgqdRLk/1/",description=news, image="https://media.revmasters.com/uploads/002xnbaseason24-970x250-aff.gif")
+  embed.add_field(name='BetUS - 125% Bonus On Your First 3 Deposits' ,value='[Click here to Sign Up]( https://record.revmasters.com/_8ejz3pKmFDsdHrf4TDP9mWNd7ZgqdRLk/1/ )', inline=False)
   await ctx.defer()
   await ctx.respond(embed=embed)
 
@@ -391,6 +401,7 @@ async def recap_command(
 ):
   recap = createRecap(f"{sport}", f"{game}")[:2000]
   embed=discord.Embed(title="BetUS - 125% Sign Up Bonus!", url="https://record.revmasters.com/_8ejz3pKmFDuMKNOJN2Xw7mNd7ZgqdRLk/1/",description=recap, image="https://media.revmasters.com/uploads/002xnbaseason24-970x250-aff.gif")
+  embed.add_field(name='BetUS - 125% Bonus On Your First 3 Deposits' ,value='[Click here to Sign Up]( https://record.revmasters.com/_8ejz3pKmFDsdHrf4TDP9mWNd7ZgqdRLk/1/ )', inline=False)
   await ctx.defer()
   await ctx.respond(embed=embed)
 
@@ -401,7 +412,7 @@ async def trivia_command(
 ):
   trivia = answerTrivia(f"{question}")[:2000]
   embed=discord.Embed(title="BetUS - 125% Sign Up Bonus!", url="https://record.revmasters.com/_8ejz3pKmFDuMKNOJN2Xw7mNd7ZgqdRLk/1/",description=trivia, image="https://media.revmasters.com/uploads/002xnbaseason24-970x250-aff.gif")
-  embed.add_field(name='125% Bonus On Your First 3 Deposits' ,value='[Click here to Sign Up]( https://record.revmasters.com/_8ejz3pKmFDsdHrf4TDP9mWNd7ZgqdRLk/1/ )', inline=False)
+  embed.add_field(name='BetUS - 125% Bonus On Your First 3 Deposits' ,value='[Click here to Sign Up]( https://record.revmasters.com/_8ejz3pKmFDsdHrf4TDP9mWNd7ZgqdRLk/1/ )', inline=False)
   await ctx.defer()
   await ctx.respond(embed=embed)
 
