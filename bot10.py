@@ -429,7 +429,7 @@ async def trivia_command(
   await ctx.respond(embed=embed)
 
 @bot.slash_command()
-async def serverInfo(self, ctx):
+async def serverinfo(self, ctx):
     for guild in bot.guilds:
         await ctx.send(guild.name)
         print(guild.name) # prints all server's names
