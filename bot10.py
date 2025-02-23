@@ -428,5 +428,10 @@ async def trivia_command(
   embed.add_field(name='BetUS - 125% Bonus On Your First 3 Deposits' ,value='[Click here to Sign Up]( https://record.revmasters.com/_8ejz3pKmFDsdHrf4TDP9mWNd7ZgqdRLk/1/ )', inline=False)
   await ctx.respond(embed=embed)
 
+@bot.slash_command()
+async def serverInfo(ctx):
+    for guild in bot.guilds:
+        print(guild.name) # prints all server's names
+
 bot.run(os.environ.get('DISCORD_BOT_TOKEN')) # run the bot with the token
 
