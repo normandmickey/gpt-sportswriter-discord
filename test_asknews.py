@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 load_dotenv()
 ASKNEWS_CLIENT_ID = os.environ.get('ASKNEWS_CLIENT_ID')
 ASKNEWS_CLIENT_SECRET = os.environ.get('ASKNEWS_CLIENT_SECRET')
-query = "Detroit Tigers vs Los Angeles Angels 2024-08-27 18:40:00-04:00"
+query = "USA vs Canada 4 Nations Hockey"
 start = (datetime.now() - timedelta(hours=48)).timestamp()
 end = datetime.now().timestamp()
 
@@ -18,5 +18,8 @@ ask = AskNewsSDK(
 )
 
 
-context = ask.news.search_news(query=query, method='kw', return_type='string', n_articles=10, categories=["Sports"], start_timestamp=int(start), end_timestamp=int(end)).as_string
-print(context)
+#context = ask.news.search_news(query=query, method='kw', return_type='string', n_articles=10, categories=["Sports"], start_timestamp=int(start), end_timestamp=int(end)).as_string
+newsArticles = ask.news.search_news(query, method='kw', return_type='dicts', n_articles=3, categories=["Sports"], string_guarantee=['hockey','Tkachuk'], premium=True, start_timestamp=int(start), end_timestamp=int(end)).as_dicts
+for article in newsArticles:
+    print(article.summary)
+        

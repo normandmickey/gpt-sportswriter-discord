@@ -356,6 +356,7 @@ async def prediction_command(
   prediction = createMessage(f"{sport}", f"{game}")[:2000]
   embed=discord.Embed(title="BetUS - 125% Sign Up Bonus!", url="https://record.revmasters.com/_8ejz3pKmFDuMKNOJN2Xw7mNd7ZgqdRLk/1/",description=prediction, image="https://media.revmasters.com/uploads/002xnbaseason24-970x250-aff.gif")
   embed.add_field(name='BetUS - 125% Bonus On Your First 3 Deposits' ,value='[Click here to Sign Up]( https://record.revmasters.com/_8ejz3pKmFDsdHrf4TDP9mWNd7ZgqdRLk/1/ )', inline=False)
+  embed.add_field(name='Donate to GPTSportsWriter' ,value='[Click here to Donate]( https://buymeacoffee.com/normandmicP )', inline=False)
   await ctx.respond(embed=embed)
 
 @bot.slash_command(name="props", description="Best Prop Bets.")
