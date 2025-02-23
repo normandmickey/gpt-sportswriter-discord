@@ -123,14 +123,14 @@ openai_client = OpenAI(
 
 
 def chat_completion_request(messages):
-    print(messages)
+    #print(messages)
     try:
         response = groq_client.chat.completions.create(
             model=GROQ_GPT_MODEL,
             messages=messages,
             max_tokens=500
         )
-        print("Groq: " + str(response))
+        #print("Groq: " + str(response))
         return response
     except:
         #print("Unable to generate ChatCompletion response")
@@ -429,8 +429,9 @@ async def trivia_command(
   await ctx.respond(embed=embed)
 
 @bot.slash_command()
-async def serverInfo(ctx):
+async def serverInfo(self, ctx):
     for guild in bot.guilds:
+        await ctx.send(guild.name)
         print(guild.name) # prints all server's names
 
 bot.run(os.environ.get('DISCORD_BOT_TOKEN')) # run the bot with the token
