@@ -179,7 +179,7 @@ def createMessage(sport_key, text):
     chat_response = chat_completion_request(messages)
     #reply = chat_response.choices[0].message.content + "\n" + random.choice(referral_links)
     reply = chat_response.choices[0].message.content
-    #print(reply)
+    print(reply)
     return reply
 
 def createProp(sport_key, text):
