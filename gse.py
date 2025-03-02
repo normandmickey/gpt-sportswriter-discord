@@ -1,12 +1,15 @@
-import requests
+import os, requests
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # get the API KEY here: https://developers.google.com/custom-search/v1/overview
-GSE_API_KEY = ""
+GSE_API_KEY=os.environ.get("GSE_API_KEY")
 # get your Search Engine ID on your CSE control panel
-SEARCH_ENGINE_ID = "274e057bcdef14354"
+SEARCH_ENGINE_ID = "165d6350f51dc4e9f"
 
 chrome_options = Options()
 # chrome_options.add_argument("--disable-extensions")
@@ -20,14 +23,14 @@ chrome_options.add_argument("--headless=new") # for Chrome >= 109
 #GOOGLE_CSE_ID="165d6350f51dc4e9f"
 
 # the search query you want
-query = "Prediction: Toronto Maple Leafs VS New York Rangers 2025-02-28"
+query = "Prediction Murray St Racers VS Belmont Bruins 2025-03-02"
 # using the first page
 page = 1
 # constructing the URL
 # doc: https://developers.google.com/custom-search/v1/using_rest
 # calculating start, (page=2) => (start=11), (page=3) => (start=21)
 start = (page - 1) * 3 + 1
-url = f"https://www.googleapis.com/customsearch/v1?key={API_KEY}&cx={SEARCH_ENGINE_ID}&q={query}&start={start}"
+url = f"https://www.googleapis.com/customsearch/v1?key={GSE_API_KEY}&cx={SEARCH_ENGINE_ID}&q={query}&start={start}"
 
 # make the API request
 data = requests.get(url).json()
