@@ -355,9 +355,9 @@ async def prediction_command(
 ):
   await ctx.defer() 
   prediction = createMessage(f"{sport}", f"{game}")[:2000]
-  #embed=discord.Embed(title="BetUS - 125% Sign Up Bonus!", url="",description=prediction, image="https://media.revmasters.com/uploads/002xnbaseason24-970x250-aff.gif")
+  #embed=discord.Embed(title="BetUS - 125% Sign Up Bonus!", url="",description=prediction)
   embed=discord.Embed(title="by GPTSportsWriter.com", url="https://www.gptsportswriter.com",description=prediction)
-  embed.add_field(title='GPTSW Commands: /prediction, /topnews, /recap' ,value='[Add to your server]( https://discord.com/oauth2/authorize?client_id=1212601996868067418 )', inline=False)
+  embed.add_field(name='GPTSW Commands: /prediction, /topnews, /recap' ,value='[Add to your server]( https://discord.com/oauth2/authorize?client_id=1212601996868067418 )', inline=False)
   #embed.add_field(name='GPTSW Discord Server' ,value='[Click here to Join]( https://discord.gg/gBzTrbyybX )', inline=False)
   #embed.add_field(name='Like GPTSportswriter?' ,value='[Click here to Donate]( https://buymeacoffee.com/normandmicP )', inline=False)
   #embed.add_field(name='Prize Picks' ,value='[Join Prize Picks]( https://app.prizepicks.com/sign-up?invite_code=PR-H7J6C3H&source=prizepicks&medium=user_referral&campaign=c300de2f-6c5a-4034-8f18-941d706df3eb&content=copy_link )', inline=False)
@@ -374,7 +374,7 @@ async def props_command(
   prop = createProp(f"{sport}", f"{game}")[:2000]
   #embed=discord.Embed(title="BetUS - 125% Sign Up Bonus!", url="",description=prediction, image="https://media.revmasters.com/uploads/002xnbaseason24-970x250-aff.gif")
   embed=discord.Embed(title="by GPTSportsWriter.com", url="https://www.gptsportswriter.com",description=prop)
-  embed.add_field(title='GPTSW Commands: /prediction, /topnews, /recap' ,value='[Add to your server]( https://discord.com/oauth2/authorize?client_id=1212601996868067418 )', inline=False)
+  embed.add_field(name='GPTSW Commands: /prediction, /topnews, /recap' ,value='[Add to your server]( https://discord.com/oauth2/authorize?client_id=1212601996868067418 )', inline=False)
   #embed.add_field(name='GPTSW Discord Server' ,value='[Click here to Join]( https://discord.gg/gBzTrbyybX )', inline=False)
   #embed.add_field(name='Like GPTSportswriter?' ,value='[Click here to Donate]( https://buymeacoffee.com/normandmicP )', inline=False)
   #embed.add_field(name='Prize Picks' ,value='[Join Prize Picks]( https://app.prizepicks.com/sign-up?invite_code=PR-H7J6C3H&source=prizepicks&medium=user_referral&campaign=c300de2f-6c5a-4034-8f18-941d706df3eb&content=copy_link )', inline=False)
@@ -390,7 +390,7 @@ async def samegameparlay_command(
   parlay = createParlay(f"{sport}", f"{game}")[:2000]
   #embed=discord.Embed(title="BetUS - 125% Sign Up Bonus!", url="",description=prediction, image="https://media.revmasters.com/uploads/002xnbaseason24-970x250-aff.gif")
   embed=discord.Embed(title="by GPTSportsWriter.com", url="https://www.gptsportswriter.com",description=parlay)
-  embed.add_field(title='GPTSW Commands: /prediction, /topnews, /recap' ,value='[Add to your server]( https://discord.com/oauth2/authorize?client_id=1212601996868067418 )', inline=False)
+  embed.add_field(name='GPTSW Commands: /prediction, /topnews, /recap' ,value='[Add to your server]( https://discord.com/oauth2/authorize?client_id=1212601996868067418 )', inline=False)
   #embed.add_field(name='GPTSW Discord Server' ,value='[Click here to Join]( https://discord.gg/gBzTrbyybX )', inline=False)
   #embed.add_field(name='Like GPTSportswriter?' ,value='[Click here to Donate]( https://buymeacoffee.com/normandmicP )', inline=False)
   #embed.add_field(name='Prize Picks' ,value='[Join Prize Picks]( https://app.prizepicks.com/sign-up?invite_code=PR-H7J6C3H&source=prizepicks&medium=user_referral&campaign=c300de2f-6c5a-4034-8f18-941d706df3eb&content=copy_link )', inline=False)
@@ -406,7 +406,7 @@ async def topnews_command(
   news = topNews(f"{sport}")[:2000]
   #embed=discord.Embed(title="BetUS - 125% Sign Up Bonus!", url="",description=prediction, image="https://media.revmasters.com/uploads/002xnbaseason24-970x250-aff.gif")
   embed=discord.Embed(title="by GPTSportsWriter.com", url="https://www.gptsportswriter.com",description=news)
-  embed.add_field(title='GPTSW Commands: /prediction, /topnews, /recap' ,value='[Add to your server]( https://discord.com/oauth2/authorize?client_id=1212601996868067418 )', inline=False)
+  embed.add_field(name='GPTSW Commands: /prediction, /topnews, /recap' ,value='[Add to your server]( https://discord.com/oauth2/authorize?client_id=1212601996868067418 )', inline=False)
   #embed.add_field(name='GPTSW Discord Server' ,value='[Click here to Join]( https://discord.gg/gBzTrbyybX )', inline=False)
   #embed.add_field(name='Like GPTSportswriter?' ,value='[Click here to Donate]( https://buymeacoffee.com/normandmicP )', inline=False)
   #embed.add_field(name='Prize Picks' ,value='[Join Prize Picks]( https://app.prizepicks.com/sign-up?invite_code=PR-H7J6C3H&source=prizepicks&medium=user_referral&campaign=c300de2f-6c5a-4034-8f18-941d706df3eb&content=copy_link )', inline=False)
@@ -423,7 +423,7 @@ async def recap_command(
   recap = createRecap(f"{sport}", f"{game}")[:2000]
   #embed=discord.Embed(title="BetUS - 125% Sign Up Bonus!", url="",description=prediction, image="https://media.revmasters.com/uploads/002xnbaseason24-970x250-aff.gif")
   embed=discord.Embed(title="by GPTSportsWriter.com", url="https://www.gptsportswriter.com",description=recap)
-  embed.add_field(title='GPTSW Commands: /prediction, /topnews, /recap' ,value='[Add to your server]( https://discord.com/oauth2/authorize?client_id=1212601996868067418 )', inline=False)
+  embed.add_field(name='GPTSW Commands: /prediction, /topnews, /recap' ,value='[Add to your server]( https://discord.com/oauth2/authorize?client_id=1212601996868067418 )', inline=False)
   #embed.add_field(name='GPTSW Discord Server' ,value='[Click here to Join]( https://discord.gg/gBzTrbyybX )', inline=False)
   #embed.add_field(name='Like GPTSportswriter?' ,value='[Click here to Donate]( https://buymeacoffee.com/normandmicP )', inline=False)
   #embed.add_field(name='Prize Picks' ,value='[Join Prize Picks]( https://app.prizepicks.com/sign-up?invite_code=PR-H7J6C3H&source=prizepicks&medium=user_referral&campaign=c300de2f-6c5a-4034-8f18-941d706df3eb&content=copy_link )', inline=False)
@@ -439,7 +439,7 @@ async def trivia_command(
   trivia = answerTrivia(f"{question}")[:2000]
   #embed=discord.Embed(title="BetUS - 125% Sign Up Bonus!", url="",description=prediction, image="https://media.revmasters.com/uploads/002xnbaseason24-970x250-aff.gif")
   embed=discord.Embed(title="by GPTSportsWriter.com", url="https://www.gptsportswriter.com",description=trivia)
-  embed.add_field(title='GPTSW Commands: /prediction, /topnews, /recap' ,value='[Add to your server]( https://discord.com/oauth2/authorize?client_id=1212601996868067418 )', inline=False)
+  embed.add_field(name='GPTSW Commands: /prediction, /topnews, /recap' ,value='[Add to your server]( https://discord.com/oauth2/authorize?client_id=1212601996868067418 )', inline=False)
   #embed.add_field(name='GPTSW Discord Server' ,value='[Click here to Join]( https://discord.gg/gBzTrbyybX )', inline=False)
   #embed.add_field(name='Like GPTSportswriter?' ,value='[Click here to Donate]( https://buymeacoffee.com/normandmicP )', inline=False)
   #embed.add_field(name='Prize Picks' ,value='[Join Prize Picks]( https://app.prizepicks.com/sign-up?invite_code=PR-H7J6C3H&source=prizepicks&medium=user_referral&campaign=c300de2f-6c5a-4034-8f18-941d706df3eb&content=copy_link )', inline=False)
