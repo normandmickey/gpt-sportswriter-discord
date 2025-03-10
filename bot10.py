@@ -30,6 +30,7 @@ ASKNEWS_CLIENT_ID = os.environ.get('ASKNEWS_CLIENT_ID')
 ASKNEWS_CLIENT_SECRET = os.environ.get('ASKNEWS_CLIENT_SECRET')
 TAVILY_API_KEY = os.environ.get('TAVILY_API_KEY')
 OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY')
+DISCORD_BOT_TOKEN = os.environ.get('DISCORD_BOT_TOKEN')
 
 clientTavily = TavilyClient(api_key=TAVILY_API_KEY)
 
@@ -445,5 +446,5 @@ async def trivia_command(
   #embed.add_field(name='BetUS - 125% Bonus On Your First 3 Deposits' ,value='[Click here to Sign Up]( https://record.revmasters.com/_8ejz3pKmFDsdHrf4TDP9mWNd7ZgqdRLk/1/ )', inline=False)
   await ctx.respond(embed=embed)
 
-bot.run(os.environ.get('DISCORD_BOT_TOKEN')) # run the bot with the token
+bot.run(DISCORD_BOT_TOKEN) # run the bot with the token
 
