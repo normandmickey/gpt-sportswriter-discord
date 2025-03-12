@@ -123,6 +123,7 @@ openai_client = OpenAI(
 )
 
 
+'''
 def chat_completion_request(messages):
     #print(messages)
     try:
@@ -143,7 +144,25 @@ def chat_completion_request(messages):
            temperature=0.3
         )
         print("OpenAI: " + str(response))
-        return response
+        return response'
+'''
+def chat_completion_request(messages):
+     completion = openai_client.chat.completions.create(
+        model="gpt-4o-search-preview",
+        web_search_options={
+           "user_location": {
+              "type": "approximate",
+              "approximate": {
+                 "country": "US",
+                 "city": "New York",
+                 "region": "New York",
+              }
+           }
+        },
+        messages=messages,
+     )
+
+     return completion
    
 def createMessage(sport_key, text):
     #print("game: " + text)
@@ -160,6 +179,7 @@ def createMessage(sport_key, text):
     messages.append({"role": "user", "content": match})
     dataGames = requests.get(f"https://api.the-odds-api.com/v4/sports/{sport_key}/odds/?apiKey={ODDS_API_KEY}&eventIds={gameId}&regions=us&markets=totals,h2h,spreads&bookmakers=draftkings,fanduel,betrivers&oddsFormat=decimal")
     odds = str(dataGames.json())
+    '''
     try:
       newsArticles = ask.news.search_news(match, method='kw', return_type='dicts', n_articles=3, categories=["Sports"], premium=True, start_timestamp=int(start), end_timestamp=int(end)).as_dicts
       for article in newsArticles:
@@ -175,7 +195,8 @@ def createMessage(sport_key, text):
       except:
         context = ""
       #print("Odds: " + odds)
-      #print("Tavily: " + context)
+      #print("Tavily: " + context)'
+    '''
     messages.append({"role": "user", "content": "Write a brief, humorous article outlining the odds and statistics for the following matchup.  Give your best bet based on the context provided take into account that underdogs win about 41 percent of the time in baseball and hockey, 35 percent in football and 25 percent in baskeball.  Your article should contain as much detail and statistics as possible yet humorous and sarcastic. Do not make anything up, if the context doesn't contain information relevant to the question politely and  humorously refuse to give a prediction. If the context is not relevant to the question politely refuse to answer the question. Your response should be in markdown format. Be funny and sarcastic." + context + " " + odds + " " + match})
     chat_response = chat_completion_request(messages)
     #reply = chat_response.choices[0].message.content + "\n" + random.choice(referral_links)
