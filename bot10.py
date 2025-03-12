@@ -147,7 +147,7 @@ def chat_completion_request(messages):
 '''
 def chat_completion_request(messages):
      completion = openai_client.chat.completions.create(
-        model="gpt-4o-search-preview",
+        model="gpt-4o-mini-search-preview",
         web_search_options={
            "user_location": {
               "type": "approximate",
