@@ -143,7 +143,7 @@ def chat_completion_request(messages):
            temperature=0.3
         )
         print("OpenAI: " + str(response))
-        return response'
+        return response
 '''
 def chat_completion_request(messages):
      completion = openai_client.chat.completions.create(
