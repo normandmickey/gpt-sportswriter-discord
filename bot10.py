@@ -122,7 +122,7 @@ openai_client = OpenAI(
    api_key=os.environ.get("OPENAI_API_KEY")
 )
 
-'''
+
 def chat_completion_request(messages):
     #print(messages)
     try:
@@ -144,6 +144,7 @@ def chat_completion_request(messages):
         )
         print("OpenAI: " + str(response))
         return response
+
 '''
 def chat_completion_request(messages):
      completion = openai_client.chat.completions.create(
@@ -162,6 +163,7 @@ def chat_completion_request(messages):
      )
 
      return completion
+'''
    
 def createMessage(sport_key, text):
     #print("game: " + text)
@@ -178,9 +180,9 @@ def createMessage(sport_key, text):
     messages.append({"role": "user", "content": match})
     dataGames = requests.get(f"https://api.the-odds-api.com/v4/sports/{sport_key}/odds/?apiKey={ODDS_API_KEY}&eventIds={gameId}&regions=us&markets=totals,h2h,spreads&bookmakers=draftkings,fanduel,betrivers&oddsFormat=decimal")
     odds = str(dataGames.json())
-    '''
+
     try:
-      newsArticles = ask.news.search_news(match, method='kw', return_type='dicts', n_articles=3, categories=["Sports"], premium=True, start_timestamp=int(start), end_timestamp=int(end)).as_dicts
+      newsArticles = ask.news.search_news(match, method='kw', return_type='dicts', n_articles=3, categories=["Sports"], premium=True).as_dicts
       for article in newsArticles:
         context += article.summary
         #print(article.summary)
@@ -195,7 +197,6 @@ def createMessage(sport_key, text):
         context = ""
       #print("Odds: " + odds)
       #print("Tavily: " + context)
-    '''
     messages.append({"role": "user", "content": "Write a brief, humorous article outlining the odds and statistics for the following matchup.  Give your best bet based on the context provided take into account that underdogs win about 41 percent of the time in baseball and hockey, 35 percent in football and 25 percent in baskeball.  Your article should contain as much detail and statistics as possible yet humorous and sarcastic. Do not make anything up, if the context doesn't contain information relevant to the question politely and  humorously refuse to give a prediction. If the context is not relevant to the question politely refuse to answer the question. Your response should be in markdown format. Be funny and sarcastic." + context + " " + odds + " " + match})
     chat_response = chat_completion_request(messages)
     #reply = chat_response.choices[0].message.content + "\n" + random.choice(referral_links)
@@ -214,7 +215,8 @@ def createProp(sport_key, text):
     messages.append({"role": "system", "content": "You are the worlds best AI Sports Handicapper and sportswriter. You are smart, funny and accurate."})
     messages.append({"role": "user", "content": text})
     try:
-      newsArticles = ask.news.search_news("best prop bets for the text " + match, method='kw', return_type='dicts', n_articles=3, categories=["Sports"], premium=True, start_timestamp=int(start), end_timestamp=int(end)).as_dicts
+      #newsArticles = ask.news.search_news("best prop bets for the text " + match, method='kw', return_type='dicts', n_articles=3, categories=["Sports"], premium=True, start_timestamp=int(start), end_timestamp=int(end)).as_dicts
+      newsArticles = ask.news.search_news("best prop bets for the text " + match, method='kw', return_type='dicts', n_articles=3, categories=["Sports"], premium=True).as_dicts
       context = ""
       for article in newsArticles:
         context += article.summary
@@ -235,7 +237,8 @@ def createParlay(sport_key, text):
     messages.append({"role": "system", "content": "You are the worlds best AI Sports Handicapper and sportswriter. You are smart, funny and accurate."})
     messages.append({"role": "user", "content": text})
     try:
-      newsArticles = ask.news.search_news("same game parlay " + text, method='kw', return_type='dicts', n_articles=3, categories=["Sports"], premium=True, start_timestamp=int(start), end_timestamp=int(end)).as_dicts
+      #newsArticles = ask.news.search_news("same game parlay " + text, method='kw', return_type='dicts', n_articles=3, categories=["Sports"], premium=True, start_timestamp=int(start), end_timestamp=int(end)).as_dicts
+      newsArticles = ask.news.search_news("same game parlay " + text, method='kw', return_type='dicts', n_articles=3, categories=["Sports"], premium=True).as_dicts
       context = ""
       for article in newsArticles:
         context += article.summary
@@ -256,7 +259,8 @@ def topNews(sport_key):
     messages.append({"role": "system", "content": "You are the worlds best AI Sports Handicapper and sportswriter. You are smart, funny and accurate."})
     messages.append({"role": "user", "content": sport_key})
     try:
-      newsArticles = ask.news.search_news(sport_key, method="kw", return_type='dicts', n_articles=3, categories=["Sports"], premium=True, start_timestamp=int(start), end_timestamp=int(end)).as_dicts
+      #newsArticles = ask.news.search_news(sport_key, method="kw", return_type='dicts', n_articles=3, categories=["Sports"], premium=True, start_timestamp=int(start), end_timestamp=int(end)).as_dicts
+      newsArticles = ask.news.search_news(sport_key, method="kw", return_type='dicts', n_articles=3, categories=["Sports"], premium=True).as_dicts
       context = ""
       for article in newsArticles:
         context += article.summary
@@ -278,7 +282,8 @@ def createRecap(sport_key, text):
     messages.append({"role": "system", "content": "You are the worlds best AI Sports Handicapper and sportswriter. You are smart, funny and accurate."})
     messages.append({"role": "user", "content": text})
     try:
-        newsArticles = ask.news.search_news("final score of the following game " + text, method='kw', return_type='dicts', n_articles=3, categories=["Sports"], premium=True, start_timestamp=int(start), end_timestamp=int(end)).as_dicts
+        #newsArticles = ask.news.search_news("final score of the following game " + text, method='kw', return_type='dicts', n_articles=3, categories=["Sports"], premium=True, start_timestamp=int(start), end_timestamp=int(end)).as_dicts
+        newsArticles = ask.news.search_news("final score of the following game " + text, method='kw', return_type='dicts', n_articles=3, categories=["Sports"], premium=True).as_dicts
         context = ""
         for article in newsArticles:
           context += article.summary
@@ -378,6 +383,7 @@ async def prediction_command(
   #embed=discord.Embed(title="BetUS - 125% Sign Up Bonus!", url="",description=prediction)
   embed=discord.Embed(title="by GPTSportsWriter.com", url="https://www.gptsportswriter.com",description=prediction)
   embed.add_field(name='GPTSW Commands: /prediction, /topnews, /recap' ,value='[Add to your server]( https://discord.com/oauth2/authorize?client_id=1212601996868067418 )', inline=False)
+  embed.add_field(name='For more', value='[Visit GPTSportsWriter.com]( https://www.gptsportswriter.com )', inline=False)
   #embed.add_field(name='GPTSW Discord Server' ,value='[Click here to Join]( https://discord.gg/gBzTrbyybX )', inline=False)
   #embed.add_field(name='Like GPTSportswriter?' ,value='[Click here to Donate]( https://buymeacoffee.com/normandmicP )', inline=False)
   #embed.add_field(name='Prize Picks' ,value='[Join Prize Picks]( https://app.prizepicks.com/sign-up?invite_code=PR-H7J6C3H&source=prizepicks&medium=user_referral&campaign=c300de2f-6c5a-4034-8f18-941d706df3eb&content=copy_link )', inline=False)
