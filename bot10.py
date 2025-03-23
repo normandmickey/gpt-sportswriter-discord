@@ -142,7 +142,7 @@ def chat_completion_request(messages):
            max_tokens=500,
            temperature=0.3
         )
-        print("OpenAI: " + str(response))
+        #print("OpenAI: " + str(response))
         return response
 
 '''
@@ -201,7 +201,7 @@ def createMessage(sport_key, text):
     chat_response = chat_completion_request(messages)
     #reply = chat_response.choices[0].message.content + "\n" + random.choice(referral_links)
     reply = chat_response.choices[0].message.content
-    print(reply)
+    print(match)
     return reply
 
 def createProp(sport_key, text):
@@ -471,6 +471,16 @@ async def trivia_command(
   #embed.add_field(name='Prize Picks' ,value='[Join Prize Picks]( https://app.prizepicks.com/sign-up?invite_code=PR-H7J6C3H&source=prizepicks&medium=user_referral&campaign=c300de2f-6c5a-4034-8f18-941d706df3eb&content=copy_link )', inline=False)
   #embed.add_field(name='BetUS - 125% Bonus On Your First 3 Deposits' ,value='[Click here to Sign Up]( https://record.revmasters.com/_8ejz3pKmFDsdHrf4TDP9mWNd7ZgqdRLk/1/ )', inline=False)
   await ctx.respond(embed=embed)
+
+@bot.slash_command(name="listservers", description="List Servers")
+async def bot_members(ctx):  
+  guild = ctx.guild
+  bot_members = []  
+  get_bot_members = ([m for m in guild.members if m.bot])  
+  for bot in get_bot_members:  
+    bot_members.append(bot.name)  
+ 
+  await ctx.send(', '.join(bot_members))
 
 bot.run(DISCORD_BOT_TOKEN) # run the bot with the token
 
