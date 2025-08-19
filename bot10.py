@@ -182,7 +182,7 @@ def createMessage(sport_key, text):
     odds = str(dataGames.json())
 
     try:
-      newsArticles = ask.news.search_news(match, method='kw', return_type='dicts', n_articles=3, categories=["Sports"], premium=True).as_dicts
+      newsArticles = ask.news.search_news(match, method='kw', return_type='dicts', n_articles=3, categories=["Sports"]).as_dicts
       for article in newsArticles:
         context += article.summary
         #print(article.summary)
