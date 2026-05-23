@@ -1,21 +1,16 @@
+import asyncio
 import discord
-import os, requests, json, pytz
-from datetime import datetime as dtdt
-import functools, asyncio, random
-import requests_cache
+import functools
+import pytz
 import time
-from dotenv import load_dotenv
-import requests_cache
-from groq import Groq
-from asknews_sdk import AskNewsSDK
-from datetime import datetime, timedelta
-from tavily import TavilyClient
-from openai import OpenAI
-from pagination import Pagination
 
-requests_cache.install_cache('api_cache', expire_after=900)
+from config_runtime import DISCORD_BOT_TOKEN, HTTP_TIMEOUT, ODDS_API_KEY, http, logger
+from analytics import ensure_analytics_table, log_command_event
+from autocomplete_helpers import autocomplete_league, autocomplete_sport_label, build_sport_maps, get_score, get_sport
+from content_generators import answerTrivia, createMessage, createParlay, createProp, createRecap, topNews
+from embeds import build_response_embed
+from topgg_helpers import post_topgg_stats
 
-load_dotenv() # load all the variables from the env file
 bot = discord.Bot()
 
 ept = pytz.timezone('US/Eastern')
@@ -23,36 +18,21 @@ utc = pytz.utc
 # str format
 #fmt = '%Y-%m-%d %H:%M:%S %Z%z'
 fmt = '%Y-%m-%d'
-GROQ_GPT_MODEL = "meta-llama/llama-4-maverick-17b-128e-instruct"
-OPENAI_GPT_MODEL = "gpt-4o"
-ODDS_API_KEY = os.environ.get('ODDS_API_KEY')
-ASKNEWS_CLIENT_ID = os.environ.get('ASKNEWS_CLIENT_ID')
-ASKNEWS_CLIENT_SECRET = os.environ.get('ASKNEWS_CLIENT_SECRET')
-TAVILY_API_KEY = os.environ.get('TAVILY_API_KEY')
-OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY')
-DISCORD_BOT_TOKEN = os.environ.get('DISCORD_BOT_TOKEN')
-
-clientTavily = TavilyClient(api_key=TAVILY_API_KEY)
-
-
-ask = AskNewsSDK(
-        client_id=ASKNEWS_CLIENT_ID,
-        client_secret=ASKNEWS_CLIENT_SECRET,
-        scopes=["news"]
-)
-
 referral_links = ["BetUS - 125% Sign Up Bonus! - https://record.revmasters.com/_8ejz3pKmFDsdHrf4TDP9mWNd7ZgqdRLk/1/","https://cash.app The CashApp is the best way to send money for free. Enter the code WPVJMVS when you sign up and we'll send you $5 when you try it.","https://www.draftkings.com/r/normandmickey","Get $50 on FanDuel Sportsbook in Bonus Bets! Terms apply. Make sure to use my invite link! https://fndl.co/jcafr4b","https://www.ny.betmgm.com/en/mobileportal/invitefriendssignup?invID=5387173","https://caesars.com/sportsbook-and-casino/referral?AR=RAF-BEG-AAV","https://fanatics.onelink.me/5kut/xxyt95qs"]
 #referral_links = ["BetUS - 125% Sign Up Bonus! - https://tinyurl.com/GPTSW2","https://cash.app The CashApp is the best way to send money for free. Enter the code WPVJMVS when you sign up and we'll send you $5 when you try it."]
 #referral_links = ["BetUS - 125% Sign Up Bonus! - https://record.revmasters.com/_8ejz3pKmFDtD3TEmsPWI0WNd7ZgqdRLk/1/"]
 
-dataSportKeys = requests.get(f"https://api.the-odds-api.com/v4/sports/?apiKey={ODDS_API_KEY}")
+dataSportKeys = http.get(f"https://api.the-odds-api.com/v4/sports/?apiKey={ODDS_API_KEY}", timeout=HTTP_TIMEOUT)
+dataSportKeys.raise_for_status()
 dataSportKeys = dataSportKeys.json()
 
-sport_keys = []
+sport_labels = []
 leagues = []
+label_to_key = {}
 
 includedSports = ['American Football',
                   'Aussie Rules',
+                  'Baseball',
                   'Basketball',
                   'Boxing',
                   'Ice Hockey',
@@ -105,254 +85,37 @@ excludedLeagues = ['icehockey_sweden_hockey_league',
                    'soccer_switzerland_superleague'
    
 ]
-for i in range(len(dataSportKeys)):
-    if (dataSportKeys[i]['has_outrights'] is False and dataSportKeys[i]['group'] in includedSports and dataSportKeys[i]['key'] not in excludedLeagues):
-       sport_keys.append(dataSportKeys[i]['key'])
-       leagues.append(dataSportKeys[i]['description'])
-
-sport_keys = [i for n, i in enumerate(sport_keys) if i not in sport_keys[:n]]
-leagues = [i for n, i in enumerate(leagues) if i not in leagues[:n]]
+sport_labels, leagues, label_to_key = build_sport_maps(dataSportKeys, includedSports, excludedLeagues)
 
 
-groq_client = Groq(
-    api_key=os.environ.get("GROQ_API_KEY"),
-)
 
-openai_client = OpenAI(
-   api_key=os.environ.get("OPENAI_API_KEY")
-)
+async def _topgg_stats_loop():
+    await bot.wait_until_ready()
+    while not bot.is_closed():
+        post_topgg_stats(bot)
+        await asyncio.sleep(1800)
 
-
-def chat_completion_request(messages):
-    #print(messages)
-    try:
-        response = groq_client.chat.completions.create(
-            model=GROQ_GPT_MODEL,
-            messages=messages,
-            max_tokens=500
-        )
-        #print("Groq: " + str(response))
-        return response
-    except:
-        #print("Unable to generate ChatCompletion response")
-        #print(f"Exception: {e}")
-        response = openai_client.chat.completions.create(
-           model=OPENAI_GPT_MODEL,
-           messages=messages,
-           max_tokens=500,
-           temperature=0.3
-        )
-        #print("OpenAI: " + str(response))
-        return response
-
-'''
-def chat_completion_request(messages):
-     completion = openai_client.chat.completions.create(
-        model="gpt-4o-mini-search-preview",
-        web_search_options={
-           "user_location": {
-              "type": "approximate",
-              "approximate": {
-                 "country": "US",
-                 "city": "New York",
-                 "region": "New York",
-              }
-           }
-        },
-        messages=messages,
-     )
-
-     return completion
-'''
-   
-def createMessage(sport_key, text):
-    #print("game: " + text)
-    odds = ""
-    context = ""
-    start = (datetime.now() - timedelta(hours=24)).timestamp()
-    end = datetime.now().timestamp()
-    game = text.split(':')
-    gameId = game[0]
-    #print("game id: " + gameId)
-    match = game[1]
-    messages = []
-    messages.append({"role": "system", "content": "You are the worlds best AI Sports Handicapper and sportswriter. You are smart, funny and accurate and use a lot of sports betting lingo. Limit your response to 1500 characters or less."})
-    messages.append({"role": "user", "content": match})
-    dataGames = requests.get(f"https://api.the-odds-api.com/v4/sports/{sport_key}/odds/?apiKey={ODDS_API_KEY}&eventIds={gameId}&regions=us&markets=totals,h2h,spreads&bookmakers=draftkings,fanduel,betrivers&oddsFormat=decimal")
-    odds = str(dataGames.json())
-
-    try:
-      newsArticles = ask.news.search_news(match, method='kw', return_type='dicts', n_articles=3, categories=["Sports"]).as_dicts
-      for article in newsArticles:
-        context += article.summary
-        #print(article.summary)
-      #print("Odds: " + odds)
-      #print("AskNews: " + context)
-    except:
-      try:
-        response = clientTavily.search(query=text, search_depth="advanced")
-        context = [{"href": obj["url"], "body": obj["content"]} for obj in response.get("results", [])]
-        #print("Tavily: " + context)
-      except:
-        context = ""
-      #print("Odds: " + odds)
-      #print("Tavily: " + context)
-    messages.append({"role": "user", "content": "Write a brief, humorous article outlining the odds and statistics for the following matchup.  Give your best bet based on the context provided take into account that underdogs win about 41 percent of the time in baseball and hockey, 35 percent in football and 25 percent in baskeball.  Your article should contain as much detail and statistics as possible yet humorous and sarcastic. Do not make anything up, if the context doesn't contain information relevant to the question politely and  humorously refuse to give a prediction. If the context is not relevant to the question politely refuse to answer the question. Your response should be in markdown format. Be funny and sarcastic." + context + " " + odds + " " + match})
-    chat_response = chat_completion_request(messages)
-    #reply = chat_response.choices[0].message.content + "\n" + random.choice(referral_links)
-    reply = chat_response.choices[0].message.content
-    print(match)
-    return reply
-
-def createProp(sport_key, text):
-    start = (datetime.now() - timedelta(hours=48)).timestamp()
-    end = datetime.now().timestamp()
-    game = text.split(':')
-    gameId = game[0]
-    #print("game id: " + gameId)
-    match = game[1]
-    messages = []
-    messages.append({"role": "system", "content": "You are the worlds best AI Sports Handicapper and sportswriter. You are smart, funny and accurate."})
-    messages.append({"role": "user", "content": text})
-    try:
-      #newsArticles = ask.news.search_news("best prop bets for the text " + match, method='kw', return_type='dicts', n_articles=3, categories=["Sports"], premium=True, start_timestamp=int(start), end_timestamp=int(end)).as_dicts
-      newsArticles = ask.news.search_news("best prop bets for the text " + match, method='kw', return_type='dicts', n_articles=3, categories=["Sports"]).as_dicts
-      context = ""
-      for article in newsArticles:
-        context += article.summary
-      #print(context)
-    except:
-      context = ""
-    messages.append({"role": "user", "content": "Write a short article outlining the best individual player prop bets for the following matchup. List the odds and probability.  Give your best bet based on the context provided only mention play prop bets that are referenced in the context and mention the sportsbook.  The response should be in markdown format." + context + " " + match})
-    chat_response = chat_completion_request(messages)
-    #reply = chat_response.choices[0].message.content + "\n" + random.choice(referral_links)
-    reply = chat_response.choices[0].message.content
-    #print(reply)
-    return reply
-
-def createParlay(sport_key, text):
-    start = (datetime.now() - timedelta(hours=12)).timestamp()
-    end = datetime.now().timestamp()
-    messages = []
-    messages.append({"role": "system", "content": "You are the worlds best AI Sports Handicapper and sportswriter. You are smart, funny and accurate."})
-    messages.append({"role": "user", "content": text})
-    try:
-      #newsArticles = ask.news.search_news("same game parlay " + text, method='kw', return_type='dicts', n_articles=3, categories=["Sports"], premium=True, start_timestamp=int(start), end_timestamp=int(end)).as_dicts
-      newsArticles = ask.news.search_news("same game parlay " + text, method='kw', return_type='dicts', n_articles=3, categories=["Sports"]).as_dicts
-      context = ""
-      for article in newsArticles:
-        context += article.summary
-      #print(context)
-    except:
-      context = ""
-    messages.append({"role": "user", "content": "Write a short article outlining the best same game parlay for the following matchup. List the odds and probability.  Give your best bet based on the context provided only mention parlays referenced in the context and include the sportsbook. Your response should be in markdown format." + context + " " + text})
-    chat_response = chat_completion_request(messages)
-    #reply = chat_response.choices[0].message.content + "\n" + random.choice(referral_links)
-    reply = chat_response.choices[0].message.content
-    #print(reply)
-    return reply
-
-def topNews(sport_key):
-    start = (datetime.now() - timedelta(hours=24)).timestamp()
-    end = datetime.now().timestamp()
-    messages = []
-    messages.append({"role": "system", "content": "You are the worlds best AI Sports Handicapper and sportswriter. You are smart, funny and accurate."})
-    messages.append({"role": "user", "content": sport_key})
-    try:
-      #newsArticles = ask.news.search_news(sport_key, method="kw", return_type='dicts', n_articles=3, categories=["Sports"], premium=True, start_timestamp=int(start), end_timestamp=int(end)).as_dicts
-      newsArticles = ask.news.search_news(sport_key, method="kw", return_type='dicts', n_articles=3, categories=["Sports"]).as_dicts
-      context = ""
-      for article in newsArticles:
-        context += article.summary
-      #print(context)
-    except:
-      context = ""
-    messages.append({"role": "user", "content": "Write a funny, but accurate article briefly summarizing the various articles. Each article is enclosed in the <doc> </doc> tag.  Ignore redundant articles. Your response should be in markdown format." + context + " " + sport_key}),
-    chat_response = chat_completion_request(messages)
-    #reply = chat_response.choices[0].message.content + "\n" + random.choice(referral_links)
-    reply = chat_response.choices[0].message.content
-    #print(reply)
-    return reply
-
-
-def createRecap(sport_key, text):
-    start = (datetime.now() - timedelta(hours=48)).timestamp()
-    end = datetime.now().timestamp()
-    messages = []
-    messages.append({"role": "system", "content": "You are the worlds best AI Sports Handicapper and sportswriter. You are smart, funny and accurate."})
-    messages.append({"role": "user", "content": text})
-    try:
-        #newsArticles = ask.news.search_news("final score of the following game " + text, method='kw', return_type='dicts', n_articles=3, categories=["Sports"], premium=True, start_timestamp=int(start), end_timestamp=int(end)).as_dicts
-        newsArticles = ask.news.search_news("final score of the following game " + text, method='kw', return_type='dicts', n_articles=3, categories=["Sports"]).as_dicts
-        context = ""
-        for article in newsArticles:
-          context += article.summary
-    except:
-        context = ""
-    #print(context)
-    #print(text)
-    messages.append({"role": "user", "content": "Write a short, humorous article recapping the results following matchup include the score and highlights. Pay specific attention to the articles and only include information from context provided that is related to the game in question do not make up any details. Your response should be in markdown format. " + context + " " + text})
-    chat_response = chat_completion_request(messages)
-    #reply = chat_response.choices[0].message.content + "\n" + random.choice(referral_links)
-    reply = chat_response.choices[0].message.content
-    #print(reply)
-    return reply
-
-def answerTrivia(text):
-    messages = []
-    messages.append({"role": "system", "content": "You are an AI sportswriter. You are smart, funny and accurate."})
-    messages.append({"role": "user", "content": text})
-    try:
-        #context = ask.news.search_news("Answer the following sports trivia question" + text, method='kw', return_type='string', n_articles=10, categories=["Sports"]).as_string
-        response = clientTavily.search(query=text, search_depth="advanced")
-        context = [{"href": obj["url"], "body": obj["content"]} for obj in response.get("results", [])]
-    except:
-        context = ""
-    context = str(context)
-    #print(context)
-    messages.append({"role": "user", "content": "Given the following context answer the sports trivia question at the end.  Be humorous but accurate.  If the question is not sports related, politely refuse to answer. Your response should be in markdown format." + context + " " + text})
-    chat_response = chat_completion_request(messages)
-    #reply = chat_response.choices[0].message.content + "\n" + random.choice(referral_links)
-    reply = chat_response.choices[0].message.content
-    #print(reply)
-    return reply
-
-async def get_sport(ctx: discord.AutocompleteContext):
-  sport = ctx.options['sport']
-  dataGames = requests.get(f"https://api.the-odds-api.com/v4/sports/{sport}/odds/?apiKey={ODDS_API_KEY}&regions=us&markets=totals&bookmakers=draftkings&oddsFormat=decimal")
-  dataGames = dataGames.json()
-  games = []
-  for i in range(len(dataGames)):
-      t = dataGames[i]['commence_time']
-      utcTime = dtdt(int(t[0:4]), int(t[5:7]), int(t[8:10]), int(t[11:13]), int(t[14:16]), int(t[17:19]), tzinfo=utc)
-      esTime = utcTime.astimezone(ept)
-      #games.append(dataGames[i]['home_team'] + " vs " + dataGames[i]['away_team'] + " " + str(esTime))
-      homeTeam = dataGames[i]['home_team'].split()
-      awayTeam = dataGames[i]['away_team'].split()
-      game = dataGames[i]['id'] + ": " + dataGames[i]['home_team'] + " vs " + dataGames[i]['away_team'] + " " + str(esTime)
-      #game = dataGames[i]['id'] + ": " + dataGames[i]['home_team'] + " vs " + dataGames[i]['away_team']
-      game = game[:100]
-      #print(game)
-      games.append(game)
-  return games
-
-async def get_score(ctx: discord.AutocompleteContext):
-  sport = ctx.options['sport']
-  dataGames = requests.get(f"https://api.the-odds-api.com/v4/sports/{sport}/scores/?daysFrom=1&apiKey={ODDS_API_KEY}")
-  dataGames = dataGames.json()
-  games = []
-  for i in range(len(dataGames)):
-      if dataGames[i]['completed'] == True:
-          t = dataGames[i]['commence_time']
-          utcTime = dtdt(int(t[0:4]), int(t[5:7]), int(t[8:10]), int(t[11:13]), int(t[14:16]), int(t[17:19]), tzinfo=utc)
-          esTime = utcTime.astimezone(ept)
-          games.append(dataGames[i]['home_team'] + " vs " + dataGames[i]['away_team'] + " " + str(esTime))
-  return games
 
 @bot.event
 async def on_ready():
-    #bot.loop.create_task(gameLoop(bot))
-    print(f"{bot.user} is ready and online!")
+    ensure_analytics_table()
+    logger.info("%s is ready and online! Installed in %s guild(s).", bot.user, len(bot.guilds))
+    post_topgg_stats(bot, force=True)
+    if not getattr(bot, '_topgg_loop_started', False):
+        bot._topgg_loop_started = True
+        bot.loop.create_task(_topgg_stats_loop())
+
+
+@bot.event
+async def on_guild_join(guild):
+    logger.info("Joined guild %s (%s). Installed in %s guild(s).", guild.name, guild.id, len(bot.guilds))
+    post_topgg_stats(bot, force=True)
+
+
+@bot.event
+async def on_guild_remove(guild):
+    logger.info("Removed from guild %s (%s). Installed in %s guild(s).", guild.name, guild.id, len(bot.guilds))
+    post_topgg_stats(bot, force=True)
 
 #async def gameLoop(bot):
 #    while True:
@@ -363,98 +126,89 @@ async def on_ready():
 #            await asyncio.sleep(10)
 #        await asyncio.sleep(900)
 
-#@bot.slash_command(name="prediction", description="Up to date AI generated predictions on sporting events.")
-#async def prediction_command(
-#  ctx: discord.ApplicationContext,
-#  sport: discord.Option(str, choices=sport_keys),
-#  game: discord.Option(str, autocomplete=discord.utils.basic_autocomplete(get_sport))
-#):
-#  await ctx.defer()
-#  await ctx.respond((createMessage(f"{sport}", f"{game}"))[:2000])
-
 @bot.slash_command(name="prediction", description="Up to date AI generated predictions on sporting events.")
 async def prediction_command(
   ctx: discord.ApplicationContext,
-  sport: discord.Option(str, choices=sport_keys),
-  game: discord.Option(str, autocomplete=discord.utils.basic_autocomplete(get_sport))
+  sport: discord.Option(str, autocomplete=discord.utils.basic_autocomplete(functools.partial(autocomplete_sport_label, sport_labels=sport_labels))),
+  game: discord.Option(str, autocomplete=discord.utils.basic_autocomplete(functools.partial(get_sport, utc=utc, ept=ept, label_to_key=label_to_key)))
 ):
-  await ctx.defer() 
-  prediction = createMessage(f"{sport}", f"{game}")[:2000]
-  #embed=discord.Embed(title="BetUS - 125% Sign Up Bonus!", url="",description=prediction)
-  embed=discord.Embed(title="by GPTSportsWriter.com", url="https://www.gptsportswriter.com",description=prediction)
-  embed.add_field(name='GPTSW Commands: /prediction, /topnews, /recap' ,value='[Add to your server]( https://discord.com/oauth2/authorize?client_id=1212601996868067418 )', inline=False)
-  embed.add_field(name='For more', value='[Visit GPTSportsWriter.com]( https://www.gptsportswriter.com )', inline=False)
-  #embed.add_field(name='GPTSW Discord Server' ,value='[Click here to Join]( https://discord.gg/gBzTrbyybX )', inline=False)
-  embed.add_field(name='Like GPTSportswriter?' ,value='[Click here to Donate]( https://buymeacoffee.com/normandmicP )', inline=False)
-  #embed.add_field(name='Prize Picks' ,value='[Join Prize Picks]( https://app.prizepicks.com/sign-up?invite_code=PR-H7J6C3H&source=prizepicks&medium=user_referral&campaign=c300de2f-6c5a-4034-8f18-941d706df3eb&content=copy_link )', inline=False)
-  #embed.add_field(name='BetUS - 125% Bonus On Your First 3 Deposits' ,value='[Click here to Sign Up]( https://record.revmasters.com/_8ejz3pKmFDsdHrf4TDP9mWNd7ZgqdRLk/1/ )', inline=False)
+  await ctx.defer()
+  started = time.perf_counter()
+  source = 'generated'
+  prediction = createMessage(label_to_key.get(sport, sport), f"{game}", utc, ept)[:2000]
+  image_url = None
+  if 'Odd$mith Best Bet:' in prediction:
+      source = 'oddsmith_pick'
+  if '\n\nImage: ' in prediction:
+      prediction, image_url = prediction.rsplit('\n\nImage: ', 1)
+      image_url = image_url.strip() or None
+  embed = build_response_embed(prediction)
+  if image_url:
+      embed.set_image(url=image_url)
   await ctx.respond(embed=embed)
+  duration_ms = int((time.perf_counter() - started) * 1000)
+  log_command_event(command_name='prediction', guild_id=str(ctx.guild.id) if ctx.guild else None, channel_id=str(ctx.channel.id) if ctx.channel else None, user_id=str(ctx.user.id), username=str(ctx.user), sport_label=sport, game_label=game, source=source, success=True, duration_ms=duration_ms)
 
 @bot.slash_command(name="props", description="Best Prop Bets.")
 async def props_command(
   ctx: discord.ApplicationContext,
-  sport: discord.Option(str, choices=sport_keys),
-  game: discord.Option(str, autocomplete=discord.utils.basic_autocomplete(get_sport))
+  sport: discord.Option(str, autocomplete=discord.utils.basic_autocomplete(functools.partial(autocomplete_sport_label, sport_labels=sport_labels))),
+  game: discord.Option(str, autocomplete=discord.utils.basic_autocomplete(functools.partial(get_sport, utc=utc, ept=ept, label_to_key=label_to_key)))
 ):
   await ctx.defer()
-  prop = createProp(f"{sport}", f"{game}")[:2000]
+  started = time.perf_counter()
+  prop = createProp(label_to_key.get(sport, sport), f"{game}", utc, ept)[:2000]
   #embed=discord.Embed(title="BetUS - 125% Sign Up Bonus!", url="",description=prediction, image="https://media.revmasters.com/uploads/002xnbaseason24-970x250-aff.gif")
-  embed=discord.Embed(title="by GPTSportsWriter.com", url="https://www.gptsportswriter.com",description=prop)
-  embed.add_field(name='GPTSW Commands: /prediction, /topnews, /recap' ,value='[Add to your server]( https://discord.com/oauth2/authorize?client_id=1212601996868067418 )', inline=False)
-  #embed.add_field(name='GPTSW Discord Server' ,value='[Click here to Join]( https://discord.gg/gBzTrbyybX )', inline=False)
-  embed.add_field(name='Like GPTSportswriter?' ,value='[Click here to Donate]( https://buymeacoffee.com/normandmicP )', inline=False)
-  #embed.add_field(name='Prize Picks' ,value='[Join Prize Picks]( https://app.prizepicks.com/sign-up?invite_code=PR-H7J6C3H&source=prizepicks&medium=user_referral&campaign=c300de2f-6c5a-4034-8f18-941d706df3eb&content=copy_link )', inline=False)
-  #embed.add_field(name='BetUS - 125% Bonus On Your First 3 Deposits' ,value='[Click here to Sign Up]( https://record.revmasters.com/_8ejz3pKmFDsdHrf4TDP9mWNd7ZgqdRLk/1/ )', inline=False)await ctx.respond(embed=embed)
+  embed = build_response_embed(prop)
+  await ctx.respond(embed=embed)
+  duration_ms = int((time.perf_counter() - started) * 1000)
+  log_command_event(command_name='props', guild_id=str(ctx.guild.id) if ctx.guild else None, channel_id=str(ctx.channel.id) if ctx.channel else None, user_id=str(ctx.user.id), username=str(ctx.user), sport_label=sport, game_label=game, source='generated', success=True, duration_ms=duration_ms)
 
 @bot.slash_command(name="samegameparlay", description="Best Same Game Parlay.")
 async def samegameparlay_command(
   ctx: discord.ApplicationContext,
-  sport: discord.Option(str, choices=sport_keys),
-  game: discord.Option(str, autocomplete=discord.utils.basic_autocomplete(get_sport))
+  sport: discord.Option(str, autocomplete=discord.utils.basic_autocomplete(functools.partial(autocomplete_sport_label, sport_labels=sport_labels))),
+  game: discord.Option(str, autocomplete=discord.utils.basic_autocomplete(functools.partial(get_sport, utc=utc, ept=ept, label_to_key=label_to_key)))
 ):
   await ctx.defer()
-  parlay = createParlay(f"{sport}", f"{game}")[:2000]
+  started = time.perf_counter()
+  parlay = createParlay(label_to_key.get(sport, sport), f"{game}")[:2000]
   #embed=discord.Embed(title="BetUS - 125% Sign Up Bonus!", url="",description=prediction, image="https://media.revmasters.com/uploads/002xnbaseason24-970x250-aff.gif")
-  embed=discord.Embed(title="by GPTSportsWriter.com", url="https://www.gptsportswriter.com",description=parlay)
-  embed.add_field(name='GPTSW Commands: /prediction, /topnews, /recap' ,value='[Add to your server]( https://discord.com/oauth2/authorize?client_id=1212601996868067418 )', inline=False)
-  #embed.add_field(name='GPTSW Discord Server' ,value='[Click here to Join]( https://discord.gg/gBzTrbyybX )', inline=False)
-  embed.add_field(name='Like GPTSportswriter?' ,value='[Click here to Donate]( https://buymeacoffee.com/normandmicP )', inline=False)
-  #embed.add_field(name='Prize Picks' ,value='[Join Prize Picks]( https://app.prizepicks.com/sign-up?invite_code=PR-H7J6C3H&source=prizepicks&medium=user_referral&campaign=c300de2f-6c5a-4034-8f18-941d706df3eb&content=copy_link )', inline=False)
-  #embed.add_field(name='BetUS - 125% Bonus On Your First 3 Deposits' ,value='[Click here to Sign Up]( https://record.revmasters.com/_8ejz3pKmFDsdHrf4TDP9mWNd7ZgqdRLk/1/ )', inline=False)
+  embed = build_response_embed(parlay)
   await ctx.respond(embed=embed)
+  duration_ms = int((time.perf_counter() - started) * 1000)
+  log_command_event(command_name='samegameparlay', guild_id=str(ctx.guild.id) if ctx.guild else None, channel_id=str(ctx.channel.id) if ctx.channel else None, user_id=str(ctx.user.id), username=str(ctx.user), sport_label=sport, game_label=game, source='generated', success=True, duration_ms=duration_ms)
 
 @bot.slash_command(name="topnews", description="Latest news by sport.")
 async def topnews_command(
   ctx: discord.ApplicationContext,
-  sport: discord.Option(str, choices=leagues),
+  sport: discord.Option(str, autocomplete=discord.utils.basic_autocomplete(functools.partial(autocomplete_league, leagues=leagues))),
 ):
   await ctx.defer()
+  started = time.perf_counter()
   news = topNews(f"{sport}")[:2000]
   #embed=discord.Embed(title="BetUS - 125% Sign Up Bonus!", url="",description=prediction, image="https://media.revmasters.com/uploads/002xnbaseason24-970x250-aff.gif")
-  embed=discord.Embed(title="by GPTSportsWriter.com", url="https://www.gptsportswriter.com",description=news)
-  embed.add_field(name='GPTSW Commands: /prediction, /topnews, /recap' ,value='[Add to your server]( https://discord.com/oauth2/authorize?client_id=1212601996868067418 )', inline=False)
-  #embed.add_field(name='GPTSW Discord Server' ,value='[Click here to Join]( https://discord.gg/gBzTrbyybX )', inline=False)
-  embed.add_field(name='Like GPTSportswriter?' ,value='[Click here to Donate]( https://buymeacoffee.com/normandmicP )', inline=False)
-  #embed.add_field(name='Prize Picks' ,value='[Join Prize Picks]( https://app.prizepicks.com/sign-up?invite_code=PR-H7J6C3H&source=prizepicks&medium=user_referral&campaign=c300de2f-6c5a-4034-8f18-941d706df3eb&content=copy_link )', inline=False)
-  #embed.add_field(name='BetUS - 125% Bonus On Your First 3 Deposits' ,value='[Click here to Sign Up]( https://record.revmasters.com/_8ejz3pKmFDsdHrf4TDP9mWNd7ZgqdRLk/1/ )', inline=False)
+  embed = build_response_embed(news)
   await ctx.respond(embed=embed)
+  duration_ms = int((time.perf_counter() - started) * 1000)
+  log_command_event(command_name='topnews', guild_id=str(ctx.guild.id) if ctx.guild else None, channel_id=str(ctx.channel.id) if ctx.channel else None, user_id=str(ctx.user.id), username=str(ctx.user), sport_label=sport, source='generated', success=True, duration_ms=duration_ms)
 
 @bot.slash_command(name="recap", description="Get highlights of recent matches.")
 async def recap_command(
   ctx: discord.ApplicationContext,
-  sport: discord.Option(str, choices=sport_keys),
-  game: discord.Option(str, autocomplete=discord.utils.basic_autocomplete(get_score))
+  sport: discord.Option(str, autocomplete=discord.utils.basic_autocomplete(functools.partial(autocomplete_sport_label, sport_labels=sport_labels))),
+  game: discord.Option(str, autocomplete=discord.utils.basic_autocomplete(functools.partial(get_score, utc=utc, ept=ept, label_to_key=label_to_key)))
 ):
   await ctx.defer()
-  recap = createRecap(f"{sport}", f"{game}")[:2000]
-  #embed=discord.Embed(title="BetUS - 125% Sign Up Bonus!", url="",description=prediction, image="https://media.revmasters.com/uploads/002xnbaseason24-970x250-aff.gif")
-  embed=discord.Embed(title="by GPTSportsWriter.com", url="https://www.gptsportswriter.com",description=recap)
-  embed.add_field(name='GPTSW Commands: /prediction, /topnews, /recap' ,value='[Add to your server]( https://discord.com/oauth2/authorize?client_id=1212601996868067418 )', inline=False)
-  #embed.add_field(name='GPTSW Discord Server' ,value='[Click here to Join]( https://discord.gg/gBzTrbyybX )', inline=False)
-  embed.add_field(name='Like GPTSportswriter?' ,value='[Click here to Donate]( https://buymeacoffee.com/normandmicP )', inline=False)
-  #embed.add_field(name='Prize Picks' ,value='[Join Prize Picks]( https://app.prizepicks.com/sign-up?invite_code=PR-H7J6C3H&source=prizepicks&medium=user_referral&campaign=c300de2f-6c5a-4034-8f18-941d706df3eb&content=copy_link )', inline=False)
-  #embed.add_field(name='BetUS - 125% Bonus On Your First 3 Deposits' ,value='[Click here to Sign Up]( https://record.revmasters.com/_8ejz3pKmFDsdHrf4TDP9mWNd7ZgqdRLk/1/ )', inline=False)
-  await ctx.respond(embed=embed)
+  started = time.perf_counter()
+  recap = createRecap(label_to_key.get(sport, sport), f"{game}", utc, ept).strip()
+  recap = recap[:3800]
+  recap_parts = [recap]
+  if 'https://oddsmith.net' not in recap:
+      recap_parts.extend(['', 'More picks: https://oddsmith.net'])
+  await ctx.respond('\n'.join(recap_parts).strip())
+  duration_ms = int((time.perf_counter() - started) * 1000)
+  log_command_event(command_name='recap', guild_id=str(ctx.guild.id) if ctx.guild else None, channel_id=str(ctx.channel.id) if ctx.channel else None, user_id=str(ctx.user.id), username=str(ctx.user), sport_label=sport, game_label=game, source='generated', success=True, duration_ms=duration_ms)
 
 @bot.slash_command(name="trivia", description="Ask me any anything sport related.")
 async def trivia_command(
@@ -462,15 +216,13 @@ async def trivia_command(
   question: discord.Option(str)
 ):
   await ctx.defer()
+  started = time.perf_counter()
   trivia = answerTrivia(f"{question}")[:2000]
   #embed=discord.Embed(title="BetUS - 125% Sign Up Bonus!", url="",description=prediction, image="https://media.revmasters.com/uploads/002xnbaseason24-970x250-aff.gif")
-  embed=discord.Embed(title="by GPTSportsWriter.com", url="https://www.gptsportswriter.com",description=trivia)
-  embed.add_field(name='GPTSW Commands: /prediction, /topnews, /recap' ,value='[Add to your server]( https://discord.com/oauth2/authorize?client_id=1212601996868067418 )', inline=False)
-  #embed.add_field(name='GPTSW Discord Server' ,value='[Click here to Join]( https://discord.gg/gBzTrbyybX )', inline=False)
-  embed.add_field(name='Like GPTSportswriter?' ,value='[Click here to Donate]( https://buymeacoffee.com/normandmicP )', inline=False)
-  #embed.add_field(name='Prize Picks' ,value='[Join Prize Picks]( https://app.prizepicks.com/sign-up?invite_code=PR-H7J6C3H&source=prizepicks&medium=user_referral&campaign=c300de2f-6c5a-4034-8f18-941d706df3eb&content=copy_link )', inline=False)
-  #embed.add_field(name='BetUS - 125% Bonus On Your First 3 Deposits' ,value='[Click here to Sign Up]( https://record.revmasters.com/_8ejz3pKmFDsdHrf4TDP9mWNd7ZgqdRLk/1/ )', inline=False)
+  embed = build_response_embed(trivia)
   await ctx.respond(embed=embed)
+  duration_ms = int((time.perf_counter() - started) * 1000)
+  log_command_event(command_name='trivia', guild_id=str(ctx.guild.id) if ctx.guild else None, channel_id=str(ctx.channel.id) if ctx.channel else None, user_id=str(ctx.user.id), username=str(ctx.user), source='generated', success=True, duration_ms=duration_ms)
 
 @bot.slash_command(name="listservers", description="List Servers")
 async def bot_members(ctx):  
