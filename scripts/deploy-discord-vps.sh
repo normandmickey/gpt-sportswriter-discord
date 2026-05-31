@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-REMOTE="norm@178.156.201.237"
+REMOTE="docstore-vps"
 REMOTE_DIR="/home/norm/gpt-sportswriter-discord"
 REMOTE_SERVICE="gpt-sportswriter-discord.service"
 BRANCH="main"
