@@ -100,6 +100,10 @@ async def _topgg_stats_loop():
 async def on_ready():
     ensure_analytics_table()
     logger.info("%s is ready and online! Installed in %s guild(s).", bot.user, len(bot.guilds))
+    try:
+        await bot.change_presence(activity=discord.Game(name="Odd$mith app - free on Google Play"))
+    except Exception as exc:
+        logger.warning("Failed to set presence: %s", exc)
     post_topgg_stats(bot, force=True)
     if not getattr(bot, '_topgg_loop_started', False):
         bot._topgg_loop_started = True
@@ -233,6 +237,22 @@ async def bot_members(ctx):
     bot_members.append(bot.name)  
  
   await ctx.send(', '.join(bot_members))
+
+
+@bot.slash_command(name="app", description="Get the Odd$mith Android app on Google Play.")
+async def app_command(ctx: discord.ApplicationContext):
+  embed = discord.Embed(
+      title="Odd$mith for Android",
+      url="https://play.google.com/store/apps/details?id=net.oddsmith.app",
+      description=(
+          "The daily slate, best bets, props, the podcast, and the blog - "
+          "in one native Android app.\n\n"
+          "- Free on Google Play\n"
+          "- Free account signup in under a minute\n"
+          "- Premium: Ask Odd$mith, Live Odds Board, Recaps, My Picks breakdowns"
+      ),
+  )
+  await ctx.respond(embed=embed)
 
 bot.run(DISCORD_BOT_TOKEN) # run the bot with the token
 

@@ -12,4 +12,9 @@ def build_response_embed(body):
         value='[Visit Odd$mith](https://oddsmith.net)',
         inline=False,
     )
+    embed.add_field(
+        name='Get the app',
+        value='[Odd$mith for Android - free on Google Play](https://play.google.com/store/apps/details?id=net.oddsmith.app)',
+        inline=False,
+    )
     return embed
