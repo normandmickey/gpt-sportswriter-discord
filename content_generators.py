@@ -4,7 +4,7 @@ from autocomplete_helpers import resolve_selected_event
 from config_runtime import ODDSMITH_BASE_URL, ODDSMITH_BOT_API_KEY, ODDS_API_KEY, logger
 from http_helpers import fetch_odds_json
 from llm_helpers import safe_chat_content
-from news_helpers import fetch_asknews_context, fetch_tavily_context
+from news_helpers import fetch_groq_compound_context, fetch_tavily_context
 from oddsmith_api import fetch_oddsmith_bot_pick, fetch_oddsmith_bot_recap, generate_oddsmith_bot_pick
 
 
@@ -59,7 +59,7 @@ def createMessage(sport_key, text, utc, ept):
         f"https://api.the-odds-api.com/v4/sports/{sport_key}/odds/?apiKey={ODDS_API_KEY}&eventIds={gameId}&regions=us&markets=totals,h2h,spreads&bookmakers=draftkings,fanduel,betrivers&oddsFormat=decimal"
     ))
 
-    context = fetch_asknews_context(match, n_articles=3)
+    context = fetch_groq_compound_context(match, n_articles=3)
     if not context:
         context = fetch_tavily_context(text)
     messages.append({
@@ -84,7 +84,7 @@ def createProp(sport_key, text, utc, ept):
     messages = []
     messages.append({"role": "system", "content": "You are the worlds best AI Sports Handicapper and sportswriter. You are smart, funny and accurate."})
     messages.append({"role": "user", "content": text})
-    context = fetch_asknews_context("best prop bets for the text " + match, n_articles=3)
+    context = fetch_groq_compound_context("best prop bets for the text " + match, n_articles=3)
     messages.append({"role": "user", "content": "Write a short article outlining the best individual player prop bets for the following matchup. List the odds and probability. Give your best bet based on the context provided only mention play prop bets that are referenced in the context and mention the sportsbook. The response should be in markdown format." + context + " " + match})
     return safe_chat_content(messages)
 
@@ -93,7 +93,7 @@ def createParlay(sport_key, text):
     messages = []
     messages.append({"role": "system", "content": "You are the worlds best AI Sports Handicapper and sportswriter. You are smart, funny and accurate."})
     messages.append({"role": "user", "content": text})
-    context = fetch_asknews_context("same game parlay " + text, n_articles=3)
+    context = fetch_groq_compound_context("same game parlay " + text, n_articles=3)
     messages.append({"role": "user", "content": "Write a short article outlining the best same game parlay for the following matchup. List the odds and probability. Give your best bet based on the context provided only mention parlays referenced in the context and include the sportsbook. Your response should be in markdown format." + context + " " + text})
     return safe_chat_content(messages)
 
@@ -102,7 +102,7 @@ def topNews(sport_key):
     messages = []
     messages.append({"role": "system", "content": "You are the worlds best AI Sports Handicapper and sportswriter. You are smart, funny and accurate."})
     messages.append({"role": "user", "content": sport_key})
-    context = fetch_asknews_context(sport_key, n_articles=3)
+    context = fetch_groq_compound_context(sport_key, n_articles=3)
     messages.append({"role": "user", "content": "Write a funny, but accurate article briefly summarizing the various articles. Each article is enclosed in the <doc> </doc> tag. Ignore redundant articles. Your response should be in markdown format." + context + " " + sport_key})
     return safe_chat_content(messages)
 
@@ -132,7 +132,7 @@ def createRecap(sport_key, text, utc=None, ept=None):
     messages = []
     messages.append({"role": "system", "content": "You are the worlds best AI Sports Handicapper and sportswriter. You are smart, funny and accurate."})
     messages.append({"role": "user", "content": resolved_match})
-    context = fetch_asknews_context("final score of the following game " + resolved_match, n_articles=3)
+    context = fetch_groq_compound_context("final score of the following game " + resolved_match, n_articles=3)
     messages.append({"role": "user", "content": "Write a short, humorous article recapping the results following matchup include the score and highlights. Pay specific attention to the articles and only include information from context provided that is related to the game in question do not make up any details. Your response should be in markdown format. " + context + " " + resolved_match})
     logger.warning("Using local recap fallback for %s / %s", sport_key, resolved_match)
     return safe_chat_content(messages)
