@@ -26,16 +26,15 @@ def fetch_groq_compound_context(query, *, n_articles=3):
             messages=[{
                 'role': 'user',
                 'content': (
-                    f"Today's date is {today}. Use live web search to gather recent news "
-                    f"(last 24-48 hours) for this sports query: {query}. "
-                    "Return only a compact factual briefing of what you found: scores, injuries, "
-                    "lineups, betting-relevant notes, and recent form. Attribute key facts inline "
-                    f"with the source, e.g. (per ESPN). Cover roughly {n_articles} stories. "
-                    "Do not write an article or make predictions. If you find nothing relevant, "
-                    "say 'No recent news found'."
+                    f"Search the web for the latest news (last 24-48 hours, today is {today}) "
+                    f"about this sports query: {query}. "
+                    "Then report what you actually found: scores, injuries, lineups, betting-relevant "
+                    "notes, and recent form. Attribute key facts inline with the source, e.g. (per ESPN). "
+                    "You MUST search before answering - do not answer from memory alone. "
+                    "Write it as a compact factual briefing of roughly 3 stories, no predictions."
                 ),
             }],
-            temperature=0.3,
+            temperature=0.4,
             max_tokens=1200,
         )
         content = (response.choices[0].message.content or '').strip()
